@@ -1,0 +1,19 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@*@model List<List<string>>
+<table>
+    @foreach (var row in Model)
+    {
+           <tr>
+            @foreach (var col in row)
+            {
+                       <td>@col</td>
+            }
+           </tr>
+    }
+</table>*@
+@*@{
+    var author = ViewBag.Output as List<string> ;
+}
+<h1>
+    @author
+</h1>*@
