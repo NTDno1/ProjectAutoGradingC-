@@ -22,7 +22,7 @@ namespace ReadExeFile.Controllers
             StuName = stuName;
             OutPut = outPut;
         }
-        public Solution(string stuName, string outPut,string question)
+        public Solution(string stuName, string outPut, string question)
         {
             StuName = stuName;
             OutPut = outPut;
@@ -80,19 +80,21 @@ namespace ReadExeFile.Controllers
             int input2 = 30; // (nếu có)
             int input3 = 5; // (nếu có)
             string output;
-            List<string> testCasse = new List<string>();
-        //string filePath = "C:\\Users\\NTD\\Desktop\\TestCase.xlsx";
-        string[] files = Directory.GetDirectories(executablePath);
-            string[] filess = Directory.GetDirectories(executablePaths);
-            string s = "|7|9|2|OUTPUT:|2  7  9|MARK:|1";
+            //string filePath = "C:\\Users\\NTD\\Desktop\\TestCase.xlsx";
+            string[] listFilePathFoder = Directory.GetDirectories(executablePath);
+            //Tên Sv + List linkfilec của sv
+            Dictionary<string, string[]> mapLinkFileC = new Dictionary<string, string[]>();
 
+            string[] filess = Directory.GetDirectories(executablePaths);
+
+            Dictionary<string, string[]> mapTestCaseFile = new Dictionary<string, string[]>();
+            Dictionary<string, TestCases[]> mapTestCaseSolution = new Dictionary<string, TestCases[]>();
 
             TestCases[] test = { };
             string[] valueTestCase = { };
             string keys = "";
             string result = "";
-            Dictionary<string, string[]> mapTestCaseFile = new Dictionary<string, string[]>();
-            Dictionary<string, TestCases[]> mapp = new Dictionary<string, TestCases[]>();
+            
             for (int i = 0; i < filess.Length; i++)
             {
                 string[] file = Directory.GetFiles(filess[i]);
@@ -128,7 +130,7 @@ namespace ReadExeFile.Controllers
                     test[test.Length - 1] = new TestCases(result, mark_str, input_str, output_str);
                     Console.WriteLine(valuee.ToString());
                 }
-                mapp.Add(result, test);
+                mapTestCaseSolution.Add(result, test);
                 Array.Resize(ref test, test.Length - 2);
                 //int ii = 0;
                 //if (mapp.ContainsKey(key))
@@ -149,67 +151,114 @@ namespace ReadExeFile.Controllers
             }
 
             // đường dẫn file exe bài tập. Key He123 value C:\Users\NTD\Desktop\SE1437\HE140001_ANVHE_1
-            Dictionary<string, string[]> mapLinkFile = new Dictionary<string, string[]>();
             // key là tên trong solution và value là Solution
+            string answer = "";
             Dictionary<string, Solution[]> mapSolutions = new Dictionary<string, Solution[]>();
             List<Solution> solutions = new List<Solution>();
-            for (int i = 0; i < files.Length; i++)  // chạy 2 forder
+            List<Solution2> solution1s = new List<Solution2>();
+            double mark = 0;
+            for (int i = 0; i < listFilePathFoder.Length; i++)  // chạy 2 forder
             {
-                string[] pathExe = Directory.GetFiles(files[i]);
-                string[] splitPath = files[i].Split('\\');
-                mapLinkFile.Add(splitPath[splitPath.Length - 1], pathExe); 
+                string[] pathExe = Directory.GetFiles(listFilePathFoder[i]);
+                string[] splitPath = listFilePathFoder[i].Split('\\');
+                mapLinkFileC.Add(splitPath[splitPath.Length - 1], pathExe);
             }
-            foreach (var entry in mapLinkFile) // lặp qua key, add value vào array
+            foreach (var entry in mapLinkFileC) // lặp qua key, add value vào array
             {
-                    string key = entry.Key;
+                string key = entry.Key;
 
-                    string[] values = entry.Value;
-                    //solutions.Add(key, null);
-                    foreach (string value in values) //chạy array lấy ra output và name cho vào list solution
+                string[] values = entry.Value;
+                
+                //solutions.Add(key, null);
+                foreach (string value in values) //chạy array lấy ra output và name cho vào list solution
+                {
+                    // Tìm vị trí cuối cùng của dấu gạch chéo ngược (\) trong chuỗi đường dẫn
+                    int lastIndex = value.LastIndexOf('\\');
+
+                    // Lấy phần tên tập tin sau dấu gạch chéo ngược
+                    answer = value.Substring(lastIndex + 1);
+
+                    // Xóa phần mở rộng file (.exe) nếu có
+                    int extensionIndex = answer.LastIndexOf('.');
+                    if (extensionIndex >= 0)
                     {
-                        // Tạo một đối tượng ProcessStartInfo để cấu hình thực thi file .exe
-                        ProcessStartInfo startInfo = new ProcessStartInfo
-                        {
-                            FileName = value,
-                            Arguments = arguments,
-                            RedirectStandardInput = true, // Chuyển hướng đầu vào của tiến trình
-                            RedirectStandardOutput = true, // Chuyển hướng đầu ra của tiến trình
-                            UseShellExecute = false, // Không sử dụng Shell để thực thi
-                            CreateNoWindow = true // Không tạo ra cửa sổ mới cho tiến trình
-                        };
-
-                        // Tạo đối tượng Process để chạy file .exe
-                        using (Process process = new Process())
-                        {
-                            process.StartInfo = startInfo;
-                            process.Start();
-
-                            // Gửi dữ liệu vào tiến trình nếu có
-                            if (input1 != null)
-                            {
-                            // truyền input
-                                process.StandardInput.WriteLine(input1);
-                                process.StandardInput.WriteLine(input2);
-                                process.StandardInput.WriteLine(input3);
-                                process.StandardInput.Close();
-                            }
-
-                            // Đọc đầu ra từ tiến trình
-                            output = process.StandardOutput.ReadToEnd();
-
-                            // Chờ tiến trình kết thúc
-                            process.WaitForExit();
-
-                            // Sử dụng giá trị đầu ra theo ý muốn trong ứng dụng web của bạn
-                            //Console.WriteLine(output);
-                            string[] outputPatchs = output.Split(':');
-                            //Console.WriteLine(outputPatchs[outputPatchs.Length - 1]);
-                            //testCases.Add(key, key, key, key);
-                            solutions.Add(new Solution(key, outputPatchs[outputPatchs.Length - 1]));
-                        }
+                        answer = answer.Substring(0, extensionIndex);
                     }
+
+                    // In ra tên tập tin Q1
+                    Console.WriteLine(answer);
+                    // Tạo một đối tượng ProcessStartInfo để cấu hình thực thi file .exe
+                    ProcessStartInfo startInfo = new ProcessStartInfo
+                    {
+                        FileName = value,
+                        Arguments = arguments,
+                        RedirectStandardInput = true, // Chuyển hướng đầu vào của tiến trình
+                        RedirectStandardOutput = true, // Chuyển hướng đầu ra của tiến trình
+                        UseShellExecute = false, // Không sử dụng Shell để thực thi
+                        CreateNoWindow = true // Không tạo ra cửa sổ mới cho tiến trình
+                    };
+
+                    // Tạo đối tượng Process để chạy file .exe
+                    using (Process process = new Process())
+                    {
+                        process.StartInfo = startInfo;
+                        process.Start();
+
+                        // Gửi dữ liệu vào tiến trình nếu có
+                        if (mapTestCaseSolution != null)
+                        {
+                            // truyền input
+                            //process.StandardInput.WriteLine(input1);
+                            //process.StandardInput.WriteLine(input2);\
+                            //process.StandardInput.WriteLine(input3
+                            foreach (var map in mapTestCaseSolution)
+                            {
+                                string keyss = map.Key;
+                                if(answer.Contains(map.Key))
+                                {
+                                    TestCases[] valuess = map.Value;
+                                    foreach (var item in valuess)
+                                    {
+                                        process.StandardInput.WriteLine(item.InPut);
+                                        process.StandardInput.Close();
+                                        output = process.StandardOutput.ReadToEnd();
+                                        //Console.WriteLine(output);
+                                        // Chờ tiến trình kết thúc
+                                        process.WaitForExit(); string cleanedInput = output.Replace("\r\n", "");
+                                        int startIndex = cleanedInput.IndexOf("OUTPUT:") + 7;
+                                        string outputValue = cleanedInput.Substring(startIndex);
+                                        // Sử dụng giá trị đầu ra theo ý muốn trong ứng dụng web của bạn
+                                        solution1s.Add(new Solution2(entry.Key, keyss, outputValue, outputValue));
+                                        //var marks = item.STT;
+                                        if (outputValue.Trim().Contains(item.Output.Trim()))
+                                        {
+                                            mark+= double.Parse(item.STT);
+                                        }
+                                        process.Start();
+                                    }
+                                }
+                                
+                            }
+                            process.StandardInput.Close();
+                        }
+
+                        //// Đọc đầu ra từ tiến trình
+                        //output = process.StandardOutput.ReadToEnd();
+
+                        //// Chờ tiến trình kết thúc
+                        //process.WaitForExit();
+
+                        //// Sử dụng giá trị đầu ra theo ý muốn trong ứng dụng web của bạn
+                        ////Console.WriteLine(output);
+                        //string[] outputPatchs = output.Split(':');
+                        ////Console.WriteLine(outputPatchs[outputPatchs.Length - 1]);
+                        ////testCases.Add(key, key, key, key);
+                        //solutions.Add(new Solution(key, outputPatchs[outputPatchs.Length - 1]));
+                        //solution1s.Add(null);
+                    }
+                }
             }
-            foreach(var solution in solutions) // add output vào trong mapSolution 
+            foreach (var solution in solutions) // add output vào trong mapSolution 
             {
                 Solution[] sos = new Solution[] { new Solution(solution.StuName, solution.OutPut) };
                 if (mapSolutions.ContainsKey(solution.StuName))
@@ -218,7 +267,7 @@ namespace ReadExeFile.Controllers
                     Solution so = new Solution(solution.StuName, solution.OutPut);
                     //sos.Append(so);
                     Array.Resize(ref sos, sos.Length + 1);
-                    sos[sos.Length-1] = so;
+                    sos[sos.Length - 1] = so;
                     mapSolutions[solution.StuName] = sos;
                 }
                 else
