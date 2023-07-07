@@ -1,19 +1,190 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
-@*@model List<List<string>>
-<table>
-    @foreach (var row in Model)
-    {
-           <tr>
-            @foreach (var col in row)
-            {
-                       <td>@col</td>
-            }
-           </tr>
-    }
-</table>*@
-@*@{
-    var author = ViewBag.Output as List<string> ;
+@using DataAccess.Models
+@{
+    Layout = null;
 }
-<h1>
-    @author
-</h1>*@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Trang chủ</title>
+    <style>
+        /* CSS cho header */
+        .header {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo {
+            color: #333;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .navigation a {
+            margin-right: 10px;
+            color: #333;
+            text-decoration: none;
+        }
+
+        /* CSS cho form */
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 5px;
+        }
+
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        /* CSS cho table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .submit-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="#" class="logo">Logo</a>
+        <div class="navigation">
+            <a href="#">Home</a>
+            <a href="#">Sản phẩm</a>
+            <a href="#">Đăng nhập</a>
+            <a href="#">Đăng xuất</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <form asp-action="GetUser" method="post">
+            <div class="form-group">
+                <label for="username">Foder</label>
+                <input name="Foder" type="text" id="username" placeholder="Foder">
+            </div>
+            <div class="form-group">
+                <label for="password">TestCase</label>
+                <input name="TestCase" type="text" id="password" placeholder="TestCase">
+            </div>
+            <div class="button-container">
+                <button class="submit-button" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+    <form id="myForm" method="post">
+        <table>
+            <tr>
+                <th>StudentName</th>
+                <th>QuestionNo</th>
+                <th>InputTestCase</th>
+                <th>OutputTestCase</th>
+                <th>Mark</th>
+                <th>OutPut</th>
+                <th>TotalMark</th>
+            </tr>
+            @if (ViewBag.list != null)
+            {
+                string a = "";
+                string b = "";
+                float totalmark = 0;
+                @foreach (Solution item in ViewBag.list)
+                {
+                    <tr>
+                        <td>
+                            <input type="hidden" name="studentNames" value="@item.StuName" />
+                            @if (a != item.StuName)
+                            {
+                                <span>@item.StuName</span>
+                            }
+                        </td>
+                        <td>
+                            <input type="hidden" name="questionNos" value="@item.Question" />
+                            @if (b != item.Question)
+                            {
+                                <span>@item.Question</span>
+                            }
+                        </td>
+                        <td><input type="text" name="inputTestCases" value="@item.InputTestCase" /></td>
+                        <td><input type="text" name="outputTestCases" value="@item.OutputTestCase" /></td>
+                        <td><input type="number" name="marks" value="@item.Mark" /></td>
+                        <td><input type="text" name="outputs" value="@item.OutPut" /></td>
+                            @if (a != item.StuName)
+                            {
+                            <td><input type="text" name="outputs" value="tổng điểm" /></td>
+                            }
+                    </tr>
+                    a = item.StuName;
+                    b = item.Question;
+                }
+            }
+            @*<tr>
+            <td >
+            <input type="hidden" name="studentNames" value="" />
+            <span></span>
+            </td>
+            <td >
+            <input type="hidden" name="questionNos" value="" />
+            <span></span>
+            </td>
+            <td ><input type="text" name="inputTestCases" value="10 6 3" /></td>
+            <td ><input type="text" name="outputTestCases" value="3 6 10" /></td>
+            <td ><input type="number" name="marks" value="1" /></td>
+            <td ><input type="text" name="outputs" value="3 6 10" /></td>
+            </tr>*@
+        </table>
+        <div class="button-container">
+            <button class="submit-button" type="submit">Submit</button>
+        </div>
+    </form>
+</body>
+</html>
+<script>
+    // JS cho nút Submit
+    var submitButton = document.querySelector('.submit-button');
+    submitButton.addEventListener('mouseover', function () {
+        this.style.backgroundColor = '#555';
+        this.style.color = '#fff';
+    });
+    submitButton.addEventListener('mouseout', function () {
+        this.style.backgroundColor = '#4CAF50';
+        this.style.color = '#fff';
+    });
+</script>

@@ -1,3 +1,6 @@
+using DataAccess.Models;
+using Microsoft.EntityFrameworkCore;
+
 namespace DataAccess
 {
     public class Program
@@ -12,7 +15,17 @@ namespace DataAccess
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddDbContext<ProjectPrn231Context>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("MyStoreDB")));
+            builder.Services.AddScoped<ProjectPrn231Context>();
+            builder.Services.AddCors(act =>
+            {
+                act.AddPolicy("_MainPolicy", options =>
+                {
+                    options.AllowAnyHeader();
+                    options.AllowAnyMethod();
+                    options.AllowAnyOrigin();
+                });
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -23,6 +36,7 @@ namespace DataAccess
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("_MainPolicy");
 
             app.UseAuthorization();
 
