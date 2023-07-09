@@ -1,6 +1,12 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using DataAccess.Models
 @{
+    var studentTotalMarks = ViewBag.StudentTotalMarks as Dictionary<string, double>;
+}
+@{
+    var listUsers = ViewBag.listUsers as List<User>;
+}
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -146,11 +152,26 @@
                         <td><input type="text" name="outputTestCases" value="@item.OutputTestCase" /></td>
                         <td><input type="number" name="marks" value="@item.Mark" /></td>
                         <td><input type="text" name="outputs" value="@item.OutPut" /></td>
-                            @if (a != item.StuName)
+                        @if (a != item.StuName)
+                        {
+                            @foreach (var mark in studentTotalMarks)
                             {
-                            <td><input type="text" name="outputs" value="tổng điểm" /></td>
+                                if(mark.Key == item.StuName)
+                                {
+                                    <td><input type="text" name="outputs" value="@mark.Value" /></td>
+                                    break;
+                                }
                             }
+                        }
                     </tr>
+
+                    @foreach (var student in listUsers)
+                    {
+                        if(student.Name != item.StuName)
+                        {
+                             <span>@student.Name Chưa hoàn thành bài thi</span>
+                        }
+                    }
                     a = item.StuName;
                     b = item.Question;
                 }

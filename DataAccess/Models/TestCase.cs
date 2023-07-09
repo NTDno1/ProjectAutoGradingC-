@@ -1,6 +1,9 @@
-﻿namespace DataAccess.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace DataAccess.Models
 {
-    public class TestCase
+    public partial class TestCase
     {
         public string Questions { get; set; }
         public string Mark { get; set; }

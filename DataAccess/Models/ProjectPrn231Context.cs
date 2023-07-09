@@ -17,8 +17,10 @@ namespace DataAccess.Models
         }
 
         public virtual DbSet<Class> Classes { get; set; } = null!;
-        public virtual DbSet<Mark> Marks { get; set; } = null!;
         public virtual DbSet<Question> Questions { get; set; } = null!;
+        public virtual DbSet<QuestionDetail> QuestionDetails { get; set; } = null!;
+        public virtual DbSet<QuestionNo> QuestionNos { get; set; } = null!;
+        public virtual DbSet<TestCaseDb> TestCaseDbs { get; set; } = null!;
         public virtual DbSet<User> Users { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -48,48 +50,80 @@ namespace DataAccess.Models
                 entity.Property(e => e.UpdateDate).HasColumnType("date");
             });
 
-            modelBuilder.Entity<Mark>(entity =>
-            {
-                entity.ToTable("Mark");
-
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
-
-                entity.Property(e => e.CreateDate).HasColumnType("date");
-
-                entity.Property(e => e.UpdateDate).HasColumnType("date");
-
-                entity.HasOne(d => d.Student)
-                    .WithMany(p => p.Marks)
-                    .HasForeignKey(d => d.StudentId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("Mark_fk0");
-            });
-
             modelBuilder.Entity<Question>(entity =>
             {
+                entity.HasNoKey();
+
                 entity.ToTable("Question");
 
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
-
                 entity.Property(e => e.CreateDate).HasColumnType("date");
-
-                entity.Property(e => e.Input).IsUnicode(false);
-
-                entity.Property(e => e.Note).IsUnicode(false);
-
-                entity.Property(e => e.Output).IsUnicode(false);
 
                 entity.Property(e => e.UpdateDate).HasColumnType("date");
 
                 entity.HasOne(d => d.QuestionNavigation)
-                    .WithMany(p => p.Questions)
+                    .WithMany()
                     .HasForeignKey(d => d.QuestionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_Question_Mark");
+                    .HasConstraintName("FK_Question_QuestionDetail");
+
+                entity.HasOne(d => d.Student)
+                    .WithMany()
+                    .HasForeignKey(d => d.StudentId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Mark_User");
+            });
+
+            modelBuilder.Entity<QuestionDetail>(entity =>
+            {
+                entity.HasKey(e => e.QuestionId);
+
+                entity.ToTable("QuestionDetail");
+
+                entity.Property(e => e.CreateDate).HasColumnType("date");
+
+                entity.Property(e => e.Note).IsUnicode(false);
+
+                entity.Property(e => e.UpdateDate).HasColumnType("date");
+            });
+
+            modelBuilder.Entity<QuestionNo>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToTable("QuestionNo");
+
+                entity.Property(e => e.Mark)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Note)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.QuestionNo1).HasColumnName("QuestionNo");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.Question)
+                    .WithMany()
+                    .HasForeignKey(d => d.QuestionId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_QuestionNo_QuestionDetail");
+
+                entity.HasOne(d => d.QuestionNo1Navigation)
+                    .WithMany()
+                    .HasForeignKey(d => d.QuestionNo1)
+                    .HasConstraintName("FK_QuestionNo_TestCaseDb");
+            });
+
+            modelBuilder.Entity<TestCaseDb>(entity =>
+            {
+                entity.HasKey(e => e.QuestionNo)
+                    .HasName("PK_TestCase");
+
+                entity.ToTable("TestCaseDb");
             });
 
             modelBuilder.Entity<User>(entity =>

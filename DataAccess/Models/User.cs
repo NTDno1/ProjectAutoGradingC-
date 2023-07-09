@@ -5,11 +5,6 @@ namespace DataAccess.Models
 {
     public partial class User
     {
-        public User()
-        {
-            Marks = new HashSet<Mark>();
-        }
-
         public int Id { get; set; }
         public string UserName { get; set; } = null!;
         public string PassWord { get; set; } = null!;
@@ -21,6 +16,5 @@ namespace DataAccess.Models
         public DateTime DateUpdate { get; set; }
 
         public virtual Class Class { get; set; } = null!;
-        public virtual ICollection<Mark> Marks { get; set; }
     }
 }

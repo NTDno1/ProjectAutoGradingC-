@@ -24,10 +24,10 @@ namespace DataAccess.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Class>>> GetClasses()
         {
-          if (_context.Classes == null)
-          {
-              return NotFound();
-          }
+            if (_context.Classes == null)
+            {
+                return NotFound();
+            }
             return await _context.Classes.ToListAsync();
         }
 
@@ -35,10 +35,10 @@ namespace DataAccess.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Class>> GetClass(int id)
         {
-          if (_context.Classes == null)
-          {
-              return NotFound();
-          }
+            if (_context.Classes == null)
+            {
+                return NotFound();
+            }
             var @class = await _context.Classes.FindAsync(id);
 
             if (@class == null)
@@ -85,10 +85,10 @@ namespace DataAccess.Controllers
         [HttpPost]
         public async Task<ActionResult<Class>> PostClass(Class @class)
         {
-          if (_context.Classes == null)
-          {
-              return Problem("Entity set 'ProjectPrn231Context.Classes'  is null.");
-          }
+            if (_context.Classes == null)
+            {
+                return Problem("Entity set 'ProjectPrn231Context.Classes'  is null.");
+            }
             _context.Classes.Add(@class);
             try
             {

@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="6.2.6" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="6.0.0" />
   </ItemGroup>
 

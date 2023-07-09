@@ -8,9 +8,9 @@
         public string OutputTestCase { get; set; }
         public string Mark { get; set; }
         public string OutPut { get; set; }
-        public float TotalMark { get; set; }
+        public double TotalMark { get; set; }
 
-        public Solution(string stuName, string question, string inputTestCase, string outputTestCase, string mark, string outPut)
+        public Solution(string stuName, string question, string inputTestCase, string outputTestCase, string mark, string outPut, double totalMark)
         {
             StuName = stuName;
             Question = question;
@@ -18,6 +18,7 @@
             OutputTestCase = outputTestCase;
             Mark = mark;
             OutPut = outPut;
+            TotalMark = totalMark;
         }
 
         public Solution(string stuName, string question, string outPut)
@@ -41,7 +42,7 @@
 
         public override string? ToString()
         {
-            return "   StudentName: " + StuName + "   QuestionNo: " + Question + "   InputTestCase: " + InputTestCase + "     : " + OutputTestCase + "   Mark: " + Mark + "   OutPut: " + OutPut;
+            return "   StudentName: " + StuName + "   QuestionNo: " + Question + "   InputTestCase: " + InputTestCase + "     : " + OutputTestCase + "   Mark: " + Mark + "   OutPut: " + OutPut+"   TotalMark"+ TotalMark;
         }
     }
 }

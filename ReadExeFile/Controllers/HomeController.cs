@@ -11,6 +11,7 @@ using System.Security.Cryptography.X509Certificates;
 using static OfficeOpenXml.ExcelErrorValue;
 using System;
 using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
 
 namespace ReadExeFile.Controllers
 {
@@ -33,6 +34,17 @@ namespace ReadExeFile.Controllers
         }
         public async Task<IActionResult> GetUser(string Foder, string TestCase)
         {
+            string[] splitPaths = Foder.Split('\\');
+            string[] fileNameParts = splitPaths[^1].Split('_');
+
+            string stringClass = fileNameParts[0];
+            string testCode = fileNameParts[1];
+
+            Console.WriteLine("String class: " + stringClass);
+            Console.WriteLine("Test code: " + testCode);
+
+            List<User> users = await GetStudentFromApi(stringClass);
+
             string executablePaths = TestCase;
             string executablePath = Foder;
             string arguments = ""; // (nếu có)
@@ -50,6 +62,7 @@ namespace ReadExeFile.Controllers
             string[] valueTestCase = { };
             string keys = "";
             string result = "";
+            string[] partss;
 
             for (int i = 0; i < filess.Length; i++)
             {
@@ -74,11 +87,21 @@ namespace ReadExeFile.Controllers
                     //    Array.Resize(ref test, test.Length - 2);
                     //}
                     string contents = System.IO.File.ReadAllText(valuee);
-                    string input_str = String.Join(" ", new[] { contents.Split('|')[1], contents.Split('|')[2], contents.Split('|')[3] });
-                    string output_str = contents.Split('|')[^3];
-                    string mark_str = contents.Split('|')[^1];
+                    //string input_str = String.Join(" ", new[] { contents.Split('|')[1], contents.Split('|')[2], contents.Split('|')[3] });
+                    //string output_str = contents.Split('|')[^3];
+                    //string mark_str = contents.Split('|')[^1];
+                    //string input1 = contents.Substring(contents.IndexOf("|") + 1, contents.IndexOf("|OUTPUT:") - contents.IndexOf("|") - 1);
+
+
+                    //string output1 = contents.Substring(contents.IndexOf("|OUTPUT:") + 8, contents.IndexOf("|MARK:") - contents.IndexOf("|OUTPUT:") - 8);
+
+                    //string mark1 = contents.Substring(contents.IndexOf("|MARK:") + 6);
+                    partss = contents.Split('|');
+                    string input1 = partss[1];
+                    string output1 = partss[3];
+                    string mark1 = partss[5];
                     Array.Resize(ref test, test.Length + 1);
-                    test[test.Length - 1] = new TestCase(result, mark_str, input_str, output_str);
+                    test[test.Length - 1] = new TestCase(result, mark1, input1, output1);
                     Console.WriteLine(valuee.ToString());
                 }
                 mapTestCaseSolution.Add(result, test);
@@ -96,6 +119,7 @@ namespace ReadExeFile.Controllers
             {
                 string[] pathExe = Directory.GetFiles(listFilePathFoder[i]);
                 string[] splitPath = listFilePathFoder[i].Split('\\');
+                string nameMssvStudent = splitPath[splitPath.Length - 1];
                 mapLinkFileC.Add(splitPath[splitPath.Length - 1], pathExe);
             }
             foreach (var entry in mapLinkFileC) // lặp qua key, add value vào array
@@ -165,12 +189,12 @@ namespace ReadExeFile.Controllers
                                         //var marks = item.STT;
                                         if (outputValue.Trim().Contains(item.Output.Trim()))
                                         {
-                                            mark += double.Parse(item.Mark);
-                                            solution1s.Add(new Solution(studentName, questionNo, item.InPut, item.Output, item.Mark, outputValue));
+                                            //mark += double.Parse(item.Mark);
+                                            solution1s.Add(new Solution(studentName, questionNo, item.InPut, item.Output, item.Mark, outputValue, Convert.ToDouble(item.Mark)));
                                         }
                                         else
                                         {
-                                            solution1s.Add(new Solution(studentName, questionNo, item.InPut, item.Output, "0", outputValue));
+                                            solution1s.Add(new Solution(studentName, questionNo, item.InPut, item.Output, "0", outputValue, double.Parse("0")));
                                         }
                                         process.Start();
                                     }
@@ -182,22 +206,27 @@ namespace ReadExeFile.Controllers
                     }
                 }
             }
-            Dictionary<string, float> studentTotalMarks = new Dictionary<string, float>();
+            Dictionary<string, double> studentTotalMarks = new Dictionary<string, double>();
 
             foreach (var so in solution1s)
             {
+                float a = 0; 
                 Console.WriteLine(so.ToString());
                 //Console.WriteLine("đây là output: " + so.OutPut);
                 if (studentTotalMarks.ContainsKey(so.StuName))
                 {
                     // Nếu học sinh đã tồn tại trong từ điển, cộng điểm vào tổng điểm hiện tại
-                    //studentTotalMarks[so.StuName] += so.Mark;
+                    studentTotalMarks[so.StuName] += so.TotalMark;
                 }
                 else
                 {
                     // Nếu học sinh chưa tồn tại trong từ điển, thêm học sinh và gán điểm ban đầu
-                    //studentTotalMarks.Add(so.StuName, so.Mark);
+                    studentTotalMarks.Add(so.StuName, so.TotalMark);
                 }
+            }
+            foreach (var kvp in studentTotalMarks)
+            {
+                Console.WriteLine("Học sinh {0}: Tổng điểm = {1}", kvp.Key, kvp.Value);
             }
 
             foreach (var solution in solutions) // add output vào trong mapSolution 
@@ -218,6 +247,8 @@ namespace ReadExeFile.Controllers
                 }
             }
             ViewBag.list = solution1s;
+            ViewBag.listUsers = users;
+            ViewBag.StudentTotalMarks = studentTotalMarks;
             return View("Index");
         }
 
@@ -230,6 +261,26 @@ namespace ReadExeFile.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public async Task<List<User>> GetStudentFromApi(string className)
+        {
+            List<User> users = new List<User>();
+
+            string link = "https://localhost:7153/api/Users/"+className;
+
+            using (HttpClient client = new HttpClient())
+            {
+                using (HttpResponseMessage res = await client.GetAsync(link))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                        users = JsonConvert.DeserializeObject<List<User>>(data);
+                    }
+                }
+            }
+            return users;
         }
     }
 }
