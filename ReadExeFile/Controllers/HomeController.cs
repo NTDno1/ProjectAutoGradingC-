@@ -126,6 +126,9 @@ namespace ReadExeFile.Controllers
             {
                 string studentName = entry.Key;
 
+                string[] parts = studentName.Split('_'); // Tách chuỗi thành các phần tử bằng dấu "_"
+                string studentCode = parts[0].Substring(2); // Lấy phần con số từ vị trí thứ 3 đến hết chuỗi
+
                 string[] values = entry.Value;
 
                 //solutions.Add(key, null);
@@ -190,11 +193,11 @@ namespace ReadExeFile.Controllers
                                         if (outputValue.Trim().Contains(item.Output.Trim()))
                                         {
                                             //mark += double.Parse(item.Mark);
-                                            solution1s.Add(new Solution(studentName, questionNo, item.InPut, item.Output, item.Mark, outputValue, Convert.ToDouble(item.Mark)));
+                                            solution1s.Add(new Solution(studentName, studentCode, questionNo, item.InPut, item.Output, item.Mark, outputValue, Convert.ToDouble(item.Mark)));
                                         }
                                         else
                                         {
-                                            solution1s.Add(new Solution(studentName, questionNo, item.InPut, item.Output, "0", outputValue, double.Parse("0")));
+                                            solution1s.Add(new Solution(studentName, studentCode, questionNo, item.InPut, item.Output, "0", outputValue, double.Parse("0")));
                                         }
                                         process.Start();
                                     }
@@ -223,29 +226,35 @@ namespace ReadExeFile.Controllers
                     // Nếu học sinh chưa tồn tại trong từ điển, thêm học sinh và gán điểm ban đầu
                     studentTotalMarks.Add(so.StuName, so.TotalMark);
                 }
+
+                User studentToRemove = users.FirstOrDefault(s => s.Mssv == so.Mssv);
+                if (studentToRemove != null)
+                {
+                    users.Remove(studentToRemove);
+                }
             }
             foreach (var kvp in studentTotalMarks)
             {
                 Console.WriteLine("Học sinh {0}: Tổng điểm = {1}", kvp.Key, kvp.Value);
             }
 
-            foreach (var solution in solutions) // add output vào trong mapSolution 
-            {
-                Solution[] sos = new Solution[] { new Solution(solution.StuName, solution.OutPut) };
-                if (mapSolutions.ContainsKey(solution.StuName))
-                {
-                    sos = mapSolutions.GetValueOrDefault(solution.StuName);
-                    Solution so = new Solution(solution.StuName, solution.OutPut);
-                    //sos.Append(so);
-                    Array.Resize(ref sos, sos.Length + 1);
-                    sos[sos.Length - 1] = so;
-                    mapSolutions[solution.StuName] = sos;
-                }
-                else
-                {
-                    mapSolutions.Add(solution.StuName, sos);
-                }
-            }
+            //foreach (var solution in solutions) // add output vào trong mapSolution 
+            //{
+            //    Solution[] sos = new Solution[] { new Solution(solution.StuName, solution.OutPut) };
+            //    if (mapSolutions.ContainsKey(solution.StuName))
+            //    {
+            //        sos = mapSolutions.GetValueOrDefault(solution.StuName);
+            //        Solution so = new Solution(solution.StuName, solution.OutPut);
+            //        //sos.Append(so);
+            //        Array.Resize(ref sos, sos.Length + 1);
+            //        sos[sos.Length - 1] = so;
+            //        mapSolutions[solution.StuName] = sos;
+            //    }
+            //    else
+            //    {
+            //        mapSolutions.Add(solution.StuName, sos);
+            //    }
+            //}
             ViewBag.list = solution1s;
             ViewBag.listUsers = users;
             ViewBag.StudentTotalMarks = studentTotalMarks;

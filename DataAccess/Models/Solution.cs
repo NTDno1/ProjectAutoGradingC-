@@ -3,6 +3,7 @@
     public class Solution
     {
         public string StuName { get; set; }
+        public string Mssv { get; set; }    
         public string Question { get; set; }
         public string InputTestCase { get; set; }
         public string OutputTestCase { get; set; }
@@ -10,9 +11,10 @@
         public string OutPut { get; set; }
         public double TotalMark { get; set; }
 
-        public Solution(string stuName, string question, string inputTestCase, string outputTestCase, string mark, string outPut, double totalMark)
+        public Solution(string stuName,string mssv, string question, string inputTestCase, string outputTestCase, string mark, string outPut, double totalMark)
         {
             StuName = stuName;
+            Mssv= mssv;
             Question = question;
             InputTestCase = inputTestCase;
             OutputTestCase = outputTestCase;
