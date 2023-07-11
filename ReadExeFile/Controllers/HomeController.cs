@@ -12,6 +12,7 @@ using static OfficeOpenXml.ExcelErrorValue;
 using System;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace ReadExeFile.Controllers
 {
@@ -32,13 +33,17 @@ namespace ReadExeFile.Controllers
             string executablePath = "C:\\Users\\NTD\\Desktop\\SE1437";
             return View();
         }
+        List<Solution> solution1s = new List<Solution>();
+        static Dictionary<string, double> studentTotalMarks = new Dictionary<string, double>();
+         static string testCode = "";
+        string stringClass = "";
         public async Task<IActionResult> GetUser(string Foder, string TestCase)
         {
             string[] splitPaths = Foder.Split('\\');
             string[] fileNameParts = splitPaths[^1].Split('_');
 
-            string stringClass = fileNameParts[0];
-            string testCode = fileNameParts[1];
+            stringClass = fileNameParts[0];
+            testCode = fileNameParts[1];
 
             Console.WriteLine("String class: " + stringClass);
             Console.WriteLine("Test code: " + testCode);
@@ -113,7 +118,6 @@ namespace ReadExeFile.Controllers
             string answer = "";
             Dictionary<string, Solution[]> mapSolutions = new Dictionary<string, Solution[]>();
             List<Solution> solutions = new List<Solution>();
-            List<Solution> solution1s = new List<Solution>();
             double mark = 0;
             for (int i = 0; i < listFilePathFoder.Length; i++)  // chạy 2 forder
             {
@@ -188,16 +192,16 @@ namespace ReadExeFile.Controllers
                                         string outputValue = cleanedInput.Substring(startIndex);
                                         // Sử dụng giá trị đầu ra theo ý muốn trong ứng dụng web của bạn
                                         //solution1s.Add(new Solution(studentName, questionNo, outputValue));
-                                        
+
                                         //var marks = item.STT;
                                         if (outputValue.Trim().Contains(item.Output.Trim()))
                                         {
                                             //mark += double.Parse(item.Mark);
-                                            solution1s.Add(new Solution(studentName, studentCode, questionNo, item.InPut, item.Output, item.Mark, outputValue, Convert.ToDouble(item.Mark)));
+                                            solution1s.Add(new Solution(studentName, studentCode, questionNo + " " + testCode, item.InPut, item.Output, item.Mark, outputValue, Convert.ToDouble(item.Mark)));
                                         }
                                         else
                                         {
-                                            solution1s.Add(new Solution(studentName, studentCode, questionNo, item.InPut, item.Output, "0", outputValue, double.Parse("0")));
+                                            solution1s.Add(new Solution(studentName, studentCode, questionNo + " " + testCode, item.InPut, item.Output, "0", outputValue, double.Parse("0")));
                                         }
                                         process.Start();
                                     }
@@ -209,11 +213,10 @@ namespace ReadExeFile.Controllers
                     }
                 }
             }
-            Dictionary<string, double> studentTotalMarks = new Dictionary<string, double>();
 
             foreach (var so in solution1s)
             {
-                float a = 0; 
+                float a = 0;
                 Console.WriteLine(so.ToString());
                 //Console.WriteLine("đây là output: " + so.OutPut);
                 if (studentTotalMarks.ContainsKey(so.StuName))
@@ -261,6 +264,71 @@ namespace ReadExeFile.Controllers
             return View("Index");
         }
 
+        [HttpPost]
+        public async Task AddToDataBase()
+        {
+            QuestionDetail questionDetail = new QuestionDetail()
+            {
+                QuestionId = testCode,
+                Q = 0,
+                Status = 1,
+                Category = 1, 
+                Note = "",
+                CreateDate = DateTime.Now,
+                UpdateDate = DateTime.Now,
+            };
+            await AddQuestionCodeFromApi(questionDetail);
+            using (ProjectPrn231Context context = new ProjectPrn231Context())
+            {
+                foreach (var item in studentTotalMarks)
+                {
+                    User users = await GetOneStudentFromApi(item.Key);
+                    Question questionDTO = new()
+                    {
+                        StudentId = users.Id,
+                        QuestionId = testCode,
+                        TotalMark = item.Value,
+                        CreateDate = DateTime.Now,
+                        UpdateDate = DateTime.Now,
+                    };
+                    context.Questions.Add(questionDTO);
+                    context.SaveChanges();  
+                }
+            }
+            //string link = "https://localhost:7153/api/Question";
+
+            //using (HttpClient client = new HttpClient())
+            //{
+            //    foreach (var item in studentTotalMarks)
+            //    {
+            //        User users = await GetOneStudentFromApi(item.Key);
+            //        QuestionDTO questionDTO = new QuestionDTO()
+            //        {
+            //            StudentId = users.Id,
+            //            QuestionId = testCode,
+            //            TotalMark = item.Value,
+            //            CreateDate = DateTime.Now,
+            //            UpdateDate = DateTime.Now,
+            //        };
+            //        try
+            //        {
+            //            HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(questionDTO), Encoding.UTF8, "application/json");
+            //            using (HttpResponseMessage res = await client.PostAsync(link, httpContent))
+            //            {
+            //            }
+            //        }
+            //        catch(Exception ex)
+            //        {
+            //            Console.WriteLine(ex.Message);
+            //        }
+            //    }
+
+            //}
+
+        }
+        public async Task AddToDataBasess()
+        {
+        }
         public IActionResult Privacy()
         {
             return View();
@@ -276,7 +344,7 @@ namespace ReadExeFile.Controllers
         {
             List<User> users = new List<User>();
 
-            string link = "https://localhost:7153/api/Users/"+className;
+            string link = "https://localhost:7153/api/Users/" + className;
 
             using (HttpClient client = new HttpClient())
             {
@@ -290,6 +358,51 @@ namespace ReadExeFile.Controllers
                 }
             }
             return users;
+        }
+
+        public async Task<User>GetOneStudentFromApi(string mssv)
+        {
+            User user = new User();
+
+            string link = "https://localhost:7153/api/Users?name=" + mssv;
+
+            using (HttpClient client = new HttpClient())
+            {
+                using (HttpResponseMessage res = await client.GetAsync(link))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                        user = JsonConvert.DeserializeObject<User>(data);
+                    }
+                }
+            }
+            return user;
+        }
+
+        public async Task AddQuestionCodeFromApi(QuestionDetail questionDetail)
+        {
+            string link = "https://localhost:7153/api/QuestionDetails";
+
+            using (HttpClient client = new HttpClient())
+            {
+                HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(questionDetail), Encoding.UTF8, "application/json");
+                using (HttpResponseMessage res = await client.PostAsync(link, httpContent))
+                {
+                }
+            }
+        }
+        public async Task AddQuestionFromApi(QuestionDTO questionDTO)
+        {
+            string link = "https://localhost:7153/api/Question";
+
+            using (HttpClient client = new HttpClient())
+            {
+                HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(questionDTO), Encoding.UTF8, "application/json");
+                using (HttpResponseMessage res = await client.PostAsync(link, httpContent))
+                {
+                }
+            }
         }
     }
 }

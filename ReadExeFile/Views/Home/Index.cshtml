@@ -115,7 +115,7 @@
             </div>
         </form>
     </div>
-    <form id="myForm" method="post">
+    <form id="myForm" asp-action="AddToDataBase" method="post">
         <table>
             <tr>
                 <th>StudentName</th>
@@ -135,7 +135,7 @@
                 {
                     <tr>
                         <td>
-                            <input type="hidden" name="studentNames" value="@item.StuName" />
+                            <input type="hidden" name="UserName" value="@item.StuName" />
                             @if (a != item.StuName)
                             {
                                 <span>@item.StuName</span>
@@ -172,8 +172,8 @@
                    
                     <tr>
                         <td>
-                            <input type="hidden" name="studentNames" value="" />
-                             <span>@student.UserName: không nộp bài</span>
+                            <input type="hidden" name="UserName" value="aa" />
+                             <span>@student.UserName: không nộp bài Hoặc File Không đúng định dạng</span>
                         </td>
                         <td>
                             <input type="hidden" name="questionNos" value="" />
@@ -190,6 +190,7 @@
             <button class="submit-button" type="submit">Submit</button>
         </div>
     </form>
+    <a asp-action="AddToDataBasess" asp-route-id="">Delete</a>
 </body>
 </html>
 <script>

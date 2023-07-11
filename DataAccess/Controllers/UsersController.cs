@@ -21,15 +21,22 @@ namespace DataAccess.Controllers
         }
 
         // GET: api/Users
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<User>>> GetUsers()
-        //{
-        //  if (_context.Users == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    return await _context.Users.ToListAsync();
-        //}
+        [HttpGet]
+        public async Task<ActionResult<User>> GetUsers(string name)
+        {
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == name);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return user;
+        }
 
         //// GET: api/Users/5
         //[HttpGet("{id}")]
