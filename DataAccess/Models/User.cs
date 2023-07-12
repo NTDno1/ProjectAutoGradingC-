@@ -7,6 +7,7 @@ namespace DataAccess.Models
     {
         public User()
         {
+            QuestionNos = new HashSet<QuestionNo>();
             Questions = new HashSet<Question>();
         }
 
@@ -21,6 +22,7 @@ namespace DataAccess.Models
         public DateTime DateUpdate { get; set; }
 
         public virtual Class Class { get; set; } = null!;
+        public virtual ICollection<QuestionNo> QuestionNos { get; set; }
         public virtual ICollection<Question> Questions { get; set; }
     }
 }

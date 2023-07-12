@@ -109,7 +109,7 @@ namespace DataAccess.Controllers
         {
           if (_context.Users == null)
           {
-              return Problem("Entity set 'ProjectPrn231Context.Users'  is null.");
+              return Problem("Entity set 'ProjectPrn231Context.Users'  is null.");  
           }
             _context.Users.Add(user);
             try

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DataAccess.Models
+﻿namespace DataAccess.Models
 {
-    public partial class QuestionNo
+    public class QuestionNoDTO
     {
         public int Id { get; set; }
         public string QuestionId { get; set; } = null!;
@@ -15,8 +12,5 @@ namespace DataAccess.Models
         public string? InputTestCase { get; set; }
         public string? OutputTestCase { get; set; }
         public string? Output { get; set; }
-
-        public virtual QuestionDetail Question { get; set; } = null!;
-        public virtual User Student { get; set; } = null!;
     }
 }

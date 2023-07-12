@@ -13,6 +13,7 @@ using System;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace ReadExeFile.Controllers
 {
@@ -33,10 +34,10 @@ namespace ReadExeFile.Controllers
             string executablePath = "C:\\Users\\NTD\\Desktop\\SE1437";
             return View();
         }
-        List<Solution> solution1s = new List<Solution>();
+        static List<Solution> solution1s = new List<Solution>();
         static Dictionary<string, double> studentTotalMarks = new Dictionary<string, double>();
-         static string testCode = "";
-        string stringClass = "";
+        static string testCode = "";
+        static string stringClass = "";
         public async Task<IActionResult> GetUser(string Foder, string TestCase)
         {
             string[] splitPaths = Foder.Split('\\');
@@ -282,17 +283,62 @@ namespace ReadExeFile.Controllers
             {
                 foreach (var item in studentTotalMarks)
                 {
-                    User users = await GetOneStudentFromApi(item.Key);
+                    User usersNotFinish = await GetOneStudentFromApi(item.Key);
                     Question questionDTO = new()
                     {
-                        StudentId = users.Id,
+                        StudentId = usersNotFinish.Id,
                         QuestionId = testCode,
                         TotalMark = item.Value,
                         CreateDate = DateTime.Now,
                         UpdateDate = DateTime.Now,
                     };
                     context.Questions.Add(questionDTO);
-                    context.SaveChanges();  
+                    context.SaveChanges();
+                }
+
+                List<User> users = await GetStudentFromApi(stringClass);
+                foreach (var so in solution1s)
+                {
+                    User studentToRemove = users.FirstOrDefault(s => s.Mssv == so.Mssv);
+                    if (studentToRemove != null)
+                    {
+                        users.Remove(studentToRemove);
+                    }
+                }
+                foreach (var item in solution1s)
+                { User user = context.Users.FirstOrDefault(u=>u.Mssv == item.Mssv);
+                    QuestionNo question = new QuestionNo()
+                    {
+                        QuestionId = testCode,
+                        StudentId = user.Id, 
+                        QuestionStt = item.Question,
+                        Mark = item.Mark,
+                        Status = "0",
+                        Note = "true",
+                        InputTestCase = item.InputTestCase,
+                        OutputTestCase= item.OutputTestCase,
+                        Output = item.OutPut
+                    };
+                    context.QuestionNos.Add(question);
+                    context.SaveChanges();
+                }
+                foreach (var item in users)
+                {
+                    User user = context.Users.FirstOrDefault(u => u.Mssv == item.Mssv);
+                    QuestionNo question = new QuestionNo()
+                    {
+                        QuestionId = testCode,
+                        StudentId = item.Id,
+                        QuestionStt = "",
+                        Mark = "0",
+                        Status = "1",
+                        Note = "NotFound",
+                        InputTestCase = "",
+                        OutputTestCase = "",
+                        Output = ""
+                    };
+                    context.QuestionNos.Add(question);
+                    context.SaveChanges();
                 }
             }
             //string link = "https://localhost:7153/api/Question";
@@ -313,11 +359,12 @@ namespace ReadExeFile.Controllers
             //        try
             //        {
             //            HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(questionDTO), Encoding.UTF8, "application/json");
-            //            using (HttpResponseMessage res = await client.PostAsync(link, httpContent))
+            //            HttpResponseMessage res = await client.PostAsync(link, httpContent);
             //            {
+
             //            }
             //        }
-            //        catch(Exception ex)
+            //        catch (Exception ex)
             //        {
             //            Console.WriteLine(ex.Message);
             //        }

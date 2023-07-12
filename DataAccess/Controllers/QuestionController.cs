@@ -41,7 +41,7 @@ namespace DataAccess.Controllers
                 CreateDate= DateTime.Now,
                 UpdateDate = DateTime.Now,
             };
-            _context.Questions.Add(add);
+                _context.Questions.Add(add);
             try
             {
                 await _context.SaveChangesAsync();

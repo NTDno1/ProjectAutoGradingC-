@@ -93,9 +93,9 @@ namespace DataAccess.Models
 
             modelBuilder.Entity<QuestionNo>(entity =>
             {
-                entity.HasNoKey();
-
                 entity.ToTable("QuestionNo");
+
+                entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.InputTestCase).IsUnicode(false);
 
@@ -113,22 +113,25 @@ namespace DataAccess.Models
 
                 entity.Property(e => e.QuestionId).HasMaxLength(50);
 
-                entity.Property(e => e.QuestionNo1).HasColumnName("QuestionNo");
+                entity.Property(e => e.QuestionStt).HasColumnName("QuestionSTT");
 
                 entity.Property(e => e.Status)
                     .HasMaxLength(50)
                     .IsUnicode(false);
 
+                entity.Property(e => e.StudentId).HasColumnName("StudentID");
+
                 entity.HasOne(d => d.Question)
-                    .WithMany()
+                    .WithMany(p => p.QuestionNos)
                     .HasForeignKey(d => d.QuestionId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_QuestionNo_QuestionDetail");
 
-                entity.HasOne(d => d.QuestionNo1Navigation)
-                    .WithMany()
-                    .HasForeignKey(d => d.QuestionNo1)
-                    .HasConstraintName("FK_QuestionNo_TestCaseDb");
+                entity.HasOne(d => d.Student)
+                    .WithMany(p => p.QuestionNos)
+                    .HasForeignKey(d => d.StudentId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_QuestionNo_User");
             });
 
             modelBuilder.Entity<TestCaseDb>(entity =>
