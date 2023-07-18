@@ -25,6 +25,15 @@ namespace DataAccess.Controllers
             }
             return await _context.Questions.ToListAsync();
         }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<Question>>> GetQuestionByStudentId(int id)
+        {
+            if (_context.Questions == null)
+            {
+                return NotFound();
+            }
+            return await _context.Questions.Where(x=>x.StudentId == id).ToListAsync();
+        }
 
         [HttpPost]
         public async Task<ActionResult<Question>> PostQuestionDetail(QuestionDTO question)

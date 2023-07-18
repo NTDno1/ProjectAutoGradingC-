@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DataAccess.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace DataAccess.Controllers
 {
@@ -14,10 +16,11 @@ namespace DataAccess.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ProjectPrn231Context _context;
-
-        public UsersController(ProjectPrn231Context context)
+        private string secretKey;
+        public UsersController(ProjectPrn231Context context, IConfiguration configuration)
         {
             _context = context;
+            secretKey = configuration.GetValue<string>("ApiSettings:Secret");
         }
 
         // GET: api/Users
@@ -38,23 +41,25 @@ namespace DataAccess.Controllers
             return user;
         }
 
-        //// GET: api/Users/5
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<User>> GetUser(int id)
-        //{
-        //  if (_context.Users == null)
-        //  {
-        //      return NotFound();
-        //  }
-        //    var user = await _context.Users.FindAsync(id);
+        // GET: api/Users/5
+        [HttpGet("{userName}/{passWord}")]
+        public async Task<ActionResult<User>> GetUser(string userName, string passWord)
+        {
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName && u.PassWord == passWord);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(secretKey);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        //    if (user == null)
-        //    {
-        //        return NotFound();
-        //    }
+            return user;
+        }
 
-        //    return user;
-        //}
         [HttpGet("{className}")]
         public async Task<ActionResult<IEnumerable<User>>> GetUser(string className)
         {

@@ -156,7 +156,7 @@
                         {
                             @foreach (var mark in studentTotalMarks)
                             {
-                                if(mark.Key == item.StuName)
+                                if (mark.Key == item.StuName)
                                 {
                                     <td><input type="text" name="outputs" value="@mark.Value" /></td>
                                     break;
@@ -169,11 +169,11 @@
                 }
                 @foreach (var student in listUsers)
                 {
-                   
+
                     <tr>
                         <td>
                             <input type="hidden" name="UserName" value="aa" />
-                             <span>@student.UserName: không nộp bài Hoặc File Không đúng định dạng</span>
+                            <span>@student.UserName: không nộp bài Hoặc File Không đúng định dạng</span>
                         </td>
                         <td>
                             <input type="hidden" name="questionNos" value="" />
@@ -186,8 +186,13 @@
                 }
             }
         </table>
+
         <div class="button-container">
-            <button class="submit-button" type="submit">Submit</button>
+            <form>
+                <span>Nhập Tên Bài Kiểm Tra</span>
+                <input value="" type="text"/>
+                <button class="submit-button" type="submit">Submit</button>
+            </form>
         </div>
     </form>
     <a asp-action="AddToDataBasess" asp-route-id="">Delete</a>

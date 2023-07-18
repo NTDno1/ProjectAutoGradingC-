@@ -8,7 +8,7 @@ namespace DataAccess.Models
         public int Id { get; set; }
         public string QuestionId { get; set; } = null!;
         public int StudentId { get; set; }
-        public string QuestionStt { get; set; } = null!;
+        public string? QuestionStt { get; set; }
         public string? Mark { get; set; }
         public string? Status { get; set; }
         public string? Note { get; set; }

@@ -33,13 +33,13 @@ namespace DataAccess.Controllers
 
         // GET: api/QuestionDetails/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<QuestionDetail>> GetQuestionDetail(string id)
+        public async Task<ActionResult<List<QuestionDetail>>> GetQuestionDetail(string id)
         {
           if (_context.QuestionDetails == null)
           {
               return NotFound();
           }
-            var questionDetail = await _context.QuestionDetails.FindAsync(id);
+            var questionDetail = await _context.QuestionDetails.Include(x => x.QuestionNos).Where(x => x.QuestionId == id).ToListAsync();
 
             if (questionDetail == null)
             {
