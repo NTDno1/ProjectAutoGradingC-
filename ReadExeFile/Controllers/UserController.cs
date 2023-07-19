@@ -15,13 +15,16 @@ namespace ReadExeFile.Controllers
             User user = await GetOneStudentFromApi(userName, passWord);
             if (user.Role == 2)
             {
-                return Redirect($"/Home");
+                //return Redirect($"/Home");
+                return RedirectToAction("ViewTeacher", "ViewUser", new { id = user.Id });
             }
             if (user.Role == 1)
             {
-                ViewBag.user = user;
+                //ViewBag.user = user;
                 //return View("Index", user);
-                return Redirect($"/ViewUser?id="+user.Id+"");
+                //return Redirect($"/ViewUser?id="+user.Id+"");
+                //TempData["UserId"] = user.Id;
+                return RedirectToAction("Index", "ViewUser",new { id = user.Id });
             }
             else
             {

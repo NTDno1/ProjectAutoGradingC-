@@ -1,0 +1,83 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using DataAccess.Models
+@model List<Question>
+@{
+    Layout = null;
+}
+@{
+    var questionNo = ViewBag.questioNo as List<QuestionNo>;
+    var classs = ViewBag.classs as List<Class>;
+}
+@if(classs!= null){
+    <table>
+        <tr>
+            <th>ClassId</th>
+            <th>ClassName</th>
+            <th>Detail</th>
+        </tr>
+        @foreach (var item in classs)
+        {
+            <tr>
+                <td><span>@item.Id</span></td>
+                <td>@item.Name</td>
+                <td>
+                <td><a asp-action="ViewTeacher" asp-route-ids="@item.Name">Detail</a></td></td>
+            </tr>
+        }
+
+    </table>
+}
+@if(classs == null){
+    <table>
+        <tr>
+            <th>CodeTest</th>
+            <th>TotaMark</th>
+            <th>Detail</th>
+        </tr>
+        @foreach (Question item in Model)
+        {
+            <tr>
+                <td><span>@item.QuestionId</span></td>
+                <td>@item.TotalMark</td>
+                <td>
+                <td><a asp-action="ViewTeacher" asp-route-ids="@item.StudentId">Detail</a></td></td>
+            </tr>
+        }
+
+    </table>
+    @if (questionNo != null)
+    {
+        <table>
+            <tr>
+                <th>CodeTest</th>
+                <th>Question</th>
+                <th>Mark</th>
+                <th>Status</th>
+                <th>Note</th>
+                <th>InputTestCase</th>
+                <th>OutPutTestCase</th>
+                <th>YourOutPut</th>
+            </tr>
+            @foreach (var item in questionNo)
+            {
+                <tr>
+                    <td><span>@item.QuestionId</span></td>
+                    <td><span>@item.QuestionStt</span></td>
+                    <td><span>@item.Mark</span></td>
+                    <td><span>@item.Status</span></td>
+                    <td><span>@item.Note</span></td>
+                    <td><span>@item.InputTestCase</span></td>
+                    <td><span>@item.OutputTestCase</span></td>
+                    <td><span>@item.Output</span></td>
+
+                </tr>
+            }
+
+        </table>
+    }
+    @if (questionNo != null)
+    {
+        <span>Học Sinh Không Có Bài Kiểm Tra</span>
+    }
+
+}

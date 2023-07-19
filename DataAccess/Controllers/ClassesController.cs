@@ -28,7 +28,7 @@ namespace DataAccess.Controllers
             {
                 return NotFound();
             }
-            return await _context.Classes.ToListAsync();
+            return await _context.Classes.Where(u=>u.Name != "Teacher").ToListAsync();
         }
 
         // GET: api/Classes/5

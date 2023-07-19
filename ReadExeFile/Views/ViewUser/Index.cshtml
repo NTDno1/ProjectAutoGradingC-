@@ -5,36 +5,51 @@
     Layout = null;
 }
 @{
-    var users = ViewBag.user as User;
-}
-@if(User != null)
-{
-    <h1>Đã nhận</h1>
+    var questionNo = ViewBag.questioNo as List<QuestionNo>;
 }
 <table>
     <tr>
-        <th>StudentName</th>
-        <th>QuestionNo</th>
-        <th>InputTestCase</th>
-        <th>OutputTestCase</th>
-        <th>Mark</th>
-        <th>OutPut</th>
-        <th>TotalMark</th>
+        <th>CodeTest</th>
+        <th>TotaMark</th>
+        <th>Detail</th>
     </tr>
     @foreach(Question item in Model)
     {
      <tr>
-            <td>
-             <input type="hidden" name="UserName" value="" />
-            </td>
-            <td>
-                <input type="hidden" name="questionNos" value="" />
-            </td>
-            <td><input type="text" name="inputTestCases" value="@item.QuestionId" /></td>
-            <td><input type="text" name="outputTestCases" value="" /></td>
-            <td><input type="number" name="marks" value="" /></td>
-            <td><input type="text" name="outputs" value="" /></td>
-        </tr>
+            <td><span>@item.QuestionId</span></td>
+            <td>@item.TotalMark</td>
+            <td><a asp-action="Index" asp-route-ids="@item.StudentId" asp-route-id="@item.StudentId">Detail</a></td>
+     </tr>
     }
    
 </table>
+@if (questionNo!= null)
+{
+    <table>
+        <tr>
+            <th>CodeTest</th>
+            <th>Question</th>
+            <th>Mark</th>
+            <th>Status</th>
+            <th>Note</th>
+            <th>InputTestCase</th>
+            <th>OutPutTestCase</th>
+            <th>YourOutPut</th>
+        </tr>
+        @foreach (var item in questionNo)
+        {
+             <tr>
+                <td><span>@item.QuestionId</span></td>
+                <td><span>@item.QuestionStt</span></td>
+                <td><span>@item.Mark</span></td>
+                <td><span>@item.Status</span></td>
+                <td><span>@item.Note</span></td>
+                <td><span>@item.InputTestCase</span></td>
+                <td><span>@item.OutputTestCase</span></td>
+                <td><span>@item.Output</span></td>
+
+             </tr>
+        }
+
+    </table>
+}

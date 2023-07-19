@@ -325,7 +325,7 @@ namespace ReadExeFile.Controllers
                 foreach (var item in users)
                 {
                     User user = context.Users.FirstOrDefault(u => u.Mssv == item.Mssv);
-                    QuestionNo question = new QuestionNo()
+                    QuestionNo questionNo = new QuestionNo()
                     {
                         QuestionId = testCode,
                         StudentId = item.Id,
@@ -337,7 +337,16 @@ namespace ReadExeFile.Controllers
                         OutputTestCase = "",
                         Output = ""
                     };
-                    context.QuestionNos.Add(question);
+                    Question question = new Question()
+                    {
+                        StudentId = item.Id,
+                        QuestionId = testCode,
+                        TotalMark = 0,
+                        CreateDate = DateTime.Now,
+                        UpdateDate = DateTime.Now,
+                    };
+                    context.Questions.Add(question);
+                    context.QuestionNos.Add(questionNo);
                     context.SaveChanges();
                 }
             }
