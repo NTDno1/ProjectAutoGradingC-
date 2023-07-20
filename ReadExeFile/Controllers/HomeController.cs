@@ -30,8 +30,12 @@ namespace ReadExeFile.Controllers
 
         public IActionResult Index()
         {
-            string executablePaths = "C:\\Users\\NTD\\Desktop\\TestCase\\paper_no1";
-            string executablePath = "C:\\Users\\NTD\\Desktop\\SE1437";
+            string data = TempData["CheckClass"] as string;
+            if (data != null)
+            {
+                ViewBag.data = data;
+                return View();
+            }
             return View();
         }
         static List<Solution> solution1s = new List<Solution>();
@@ -40,6 +44,10 @@ namespace ReadExeFile.Controllers
         static string stringClass = "";
         public async Task<IActionResult> GetUser(string Foder, string TestCase)
         {
+            solution1s.Clear();
+            studentTotalMarks.Clear();
+            testCode = "";
+            stringClass = "";
             string[] splitPaths = Foder.Split('\\');
             string[] fileNameParts = splitPaths[^1].Split('_');
 
@@ -204,7 +212,6 @@ namespace ReadExeFile.Controllers
 
             foreach (var so in solution1s)
             {
-                float a = 0;
                 Console.WriteLine(so.ToString());
                 //Console.WriteLine("đây là output: " + so.OutPut);
                 if (studentTotalMarks.ContainsKey(so.StuName))
@@ -253,7 +260,7 @@ namespace ReadExeFile.Controllers
         }
 
         [HttpPost]
-        public async Task AddToDataBase()
+        public async Task<IActionResult> AddToDataBase()
         {
             QuestionDetail questionDetail = new QuestionDetail()
             {
@@ -265,20 +272,26 @@ namespace ReadExeFile.Controllers
                 CreateDate = DateTime.Now,
                 UpdateDate = DateTime.Now,
             };
-            await AddQuestionCodeFromApi(questionDetail);
-            using (ProjectPrn231Context context = new ProjectPrn231Context())
+            int checkQuestionDetail = await AddQuestionCodeFromApi(questionDetail);
+                using (ProjectPrn231Context context = new ProjectPrn231Context())
             {
+                var checkClass = context.Questions.Include(x => x.Class).FirstOrDefault(u=>u.Class.Name == stringClass);
+                if(checkClass != null)
+                {
+                    TempData["CheckClass"] = "Lớp Học này đã hoàn thành  mã đề "+checkClass.QuestionId+"";
+                    return RedirectToAction("Index", "Home");
+                }
                 foreach (var item in studentTotalMarks)
                 {
-                    User usersNotFinish = await GetOneStudentFromApi(item.Key);
+                    User usersFinish = await GetOneStudentFromApi(item.Key);
                     Question questionDTO = new()
                     {
-                        StudentId = usersNotFinish.Id,
+                        StudentId = usersFinish.Id,
                         QuestionId = testCode,
                         TotalMark = item.Value,
                         CreateDate = DateTime.Now,
                         UpdateDate = DateTime.Now,
-                        ClassId = usersNotFinish.ClassId
+                        ClassId = usersFinish.ClassId
                     };
                     context.Questions.Add(questionDTO);
                     context.SaveChanges();
@@ -342,6 +355,7 @@ namespace ReadExeFile.Controllers
                     context.SaveChanges();
                 }
             }
+            return Ok();
         }
         public async Task AddToDataBasess()
         {
@@ -376,12 +390,12 @@ namespace ReadExeFile.Controllers
             }
             return users;
         }
-
-        public async Task<User>GetOneStudentFromApi(string mssv)
+                
+        public async Task<User>GetOneStudentFromApi(string name)
         {
             User user = new User();
 
-            string link = "https://localhost:7153/api/Users?name=" + mssv;
+            string link = "https://localhost:7153/api/Users?name=" + name;
 
             using (HttpClient client = new HttpClient())
             {
@@ -397,7 +411,7 @@ namespace ReadExeFile.Controllers
             return user;
         }
 
-        public async Task AddQuestionCodeFromApi(QuestionDetail questionDetail)
+        public async Task<int> AddQuestionCodeFromApi(QuestionDetail questionDetail)
         {
             string link = "https://localhost:7153/api/QuestionDetails";
 
@@ -406,6 +420,16 @@ namespace ReadExeFile.Controllers
                 HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(questionDetail), Encoding.UTF8, "application/json");
                 using (HttpResponseMessage res = await client.PostAsync(link, httpContent))
                 {
+                    if (res.IsSuccessStatusCode)
+                    {
+                        // Add successful, return 1
+                        return 1;
+                    }
+                    else
+                    {
+                        // Add unsuccessful, return 0
+                        return 0;
+                    }
                 }
             }
         }

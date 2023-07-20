@@ -23,7 +23,7 @@ namespace ReadExeFile.Controllers
                 //ViewBag.user = user;
                 //return View("Index", user);
                 //return Redirect($"/ViewUser?id="+user.Id+"");
-                //TempData["UserId"] = user.Id;
+                TempData["UserId"] = user.Id;
                 return RedirectToAction("Index", "ViewUser",new { id = user.Id });
             }
             else
