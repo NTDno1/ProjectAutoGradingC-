@@ -1,13 +1,26 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using DataAccess.Models
-@model List<Question>
+@model List<QuestionDTO>
 @{
     Layout = null;
 }
 @{
     var questionNo = ViewBag.questioNo as List<QuestionNo>;
+    var listMarkDetail = ViewBag.listMarkDetail as List<QuestionNo>;
     var classs = ViewBag.classs as List<Class>;
+    var user = ViewBag.users as List<UserDTO>;
+    var questionList = ViewBag.questionList as List<QuestionDTO>;
 }
+<div class="header">
+    <a href="#" class="logo">Logo</a>
+    <div class="navigation">
+        <a href=""</a>
+        <a href="#">Xem Điểm</a>
+        <a href="#">Đăng nhập</a>
+        <a href="#">Đăng xuất</a>
+    </div>
+</div>
+<div class="container">
 @if(classs!= null){
     <table>
         <tr>
@@ -20,64 +33,160 @@
             <tr>
                 <td><span>@item.Id</span></td>
                 <td>@item.Name</td>
-                <td>
-                <td><a asp-action="ViewTeacher" asp-route-ids="@item.Name">Detail</a></td></td>
+                <td><a asp-action="ViewTeacher" asp-route-classId="@item.Id">Detail</a></td>
             </tr>
         }
 
     </table>
-}
-@if(classs == null){
-    <table>
-        <tr>
-            <th>CodeTest</th>
-            <th>TotaMark</th>
-            <th>Detail</th>
-        </tr>
-        @foreach (Question item in Model)
-        {
-            <tr>
-                <td><span>@item.QuestionId</span></td>
-                <td>@item.TotalMark</td>
-                <td>
-                <td><a asp-action="ViewTeacher" asp-route-ids="@item.StudentId">Detail</a></td></td>
-            </tr>
-        }
-
-    </table>
-    @if (questionNo != null)
+    if(user!= null)
     {
         <table>
             <tr>
-                <th>CodeTest</th>
-                <th>Question</th>
-                <th>Mark</th>
-                <th>Status</th>
-                <th>Note</th>
-                <th>InputTestCase</th>
-                <th>OutPutTestCase</th>
-                <th>YourOutPut</th>
+                <th>StudentsCode</th>
+                <th>Full Name</th>
+                <th>MSSV</th>
+                <th>ClassName</th>
+                <th>Detail</th>
             </tr>
-            @foreach (var item in questionNo)
+            @foreach (var item in user)
             {
                 <tr>
-                    <td><span>@item.QuestionId</span></td>
-                    <td><span>@item.QuestionStt</span></td>
-                    <td><span>@item.Mark</span></td>
-                    <td><span>@item.Status</span></td>
-                    <td><span>@item.Note</span></td>
-                    <td><span>@item.InputTestCase</span></td>
-                    <td><span>@item.OutputTestCase</span></td>
-                    <td><span>@item.Output</span></td>
-
+                    <td><span>@item.studentCode</span></td>
+                    <td><span>@item.fullName</span></td>
+                    <td><span>@item.mssv</span></td>
+                    <td><span>@item.className</span></td>
+                    <td><a asp-action="ViewTeacher" asp-route-classId="@item.classId" asp-route-studentId="@item.Studentid">Detail</a></td>
                 </tr>
             }
 
         </table>
     }
-    @if (questionNo != null)
+    @if (questionList != null)
     {
-        <span>Học Sinh Không Có Bài Kiểm Tra</span>
+        <table>
+            <tr>
+                <th>StudentId</th>
+                <th>QuestionId</th>
+                <th>TotalMark</th>
+                <th>StudentCode</th>
+                <th>FullName</th>
+                <th>ClassName</th>
+                <th>Detail</th>
+            </tr>
+            @foreach(var item in questionList)
+            {
+                <tr>
+                <td><span>@item.StudentId</span></td>
+                <td><span>@item.QuestionId</span></td>
+                <td><span>@item.TotalMark</span></td>
+                <td><span>@item.studentCode</span></td>
+                <td><span>@item.studentName</span></td>
+                <td><span>@item.classs</span></td>
+                <td><a asp-action="ViewTeacher" asp-route-classId="@item.classId" asp-route-studentId="@item.StudentId" asp-route-markDetail="@item.QuestionId">Detail</a></td>
+                </tr>
+            }
+        </table>
+    }
+    @if (listMarkDetail!= null)
+    {
+        <table>
+            <tr>
+                <th>StudentId</th>
+                <th>QuestionId</th>
+                <th>MarkOfTestCase</th>
+                <th>InputTestCase</th>
+                <th>OutputTestCase</th>
+                <th>YourOutput</th>
+                <th>Detail</th>
+
+            </tr>
+            @foreach (var item in listMarkDetail)
+            {
+                <tr>
+                    <td><span>@item.StudentId</span></td>
+                    <td><span>@item.QuestionId</span></td>
+                    <td><span>@item.Mark</span></td>
+                    <td><span>@item.InputTestCase</span></td>
+                    <td><span>@item.OutputTestCase</span></td>
+                    <td><span>@item.Output</span></td>
+                    <td><a asp-action="ViewTeacher" asp-route-classId="@item.ClassId" asp-route-studentId="@item.StudentId" asp-route-listMarkDetail="@item.QuestionId">Detail</a></td>
+                </tr>
+            }
+        </table>
+    }
+}
+</div>
+
+<style>
+
+    /* CSS cho header */
+    .header {
+        background-color: #f2f2f2;
+        padding: 10px;
+        text-align: center;
     }
 
-}
+    .logo {
+        color: #333;
+        font-size: 24px;
+        text-decoration: none;
+    }
+
+    .navigation a {
+        margin-right: 10px;
+        color: #333;
+        text-decoration: none;
+    }
+    /* Customize table styles */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f2f5; /* Light gray background */
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #1877F2; /* Blue header color */
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2; /* Even row color */
+    }
+
+    tr:hover {
+        background-color: #ddd; /* Hover row color */
+    }
+
+    /* Customize anchor (link) styles */
+    a {
+        color: #1877F2; /* Blue link color */
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+        a:hover {
+            color: #0F5; /* Darker blue on hover */
+            text-decoration: underline;
+        }
+</style>

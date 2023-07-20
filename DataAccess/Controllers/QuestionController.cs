@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.WebSockets;
 
 namespace DataAccess.Controllers
 {
@@ -25,14 +26,35 @@ namespace DataAccess.Controllers
             }
             return await _context.Questions.ToListAsync();
         }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<Question>>> GetQuestionByStudentId(int id)
+        [HttpGet("/id")]
+        public dynamic GetQuestionByStudentId(int id)
         {
             if (_context.Questions == null)
             {
                 return NotFound();
             }
-            return await _context.Questions.Where(x=>x.StudentId == id).ToListAsync();
+            var list =  _context.Questions.Include(u => u.Student).Where(x => x.StudentId == id).Select(x =>
+            new
+            {
+                studentId = x.StudentId,
+                questionId = x.QuestionId,
+                totalMark = x.TotalMark,
+                studentCode = x.Student.UserName,
+                studentName = x.Student.Name,
+                classId = x.ClassId,
+                classs = x.Class.Name
+            }).ToList();
+            return list;
+        }
+
+        [HttpGet("{classId}")]
+        public async Task<ActionResult<IEnumerable<Question>>> GetQuestionByClass(int classId)
+        {
+            if (_context.Questions == null)
+            {
+                return NotFound();
+            }
+            return await _context.Questions.Where(x => x.ClassId == classId).ToListAsync();
         }
 
         [HttpPost]

@@ -49,6 +49,22 @@ namespace DataAccess.Controllers
             return questionNo;
         }
 
+        [HttpGet("{studentId}/{questionId}")]
+        public async Task<ActionResult<List<QuestionNo>>> GetQuestionNo(int studentId, string questionId)
+        {
+            if (_context.QuestionNos == null)
+            {
+                return NotFound();
+            }
+            var questionNo = await _context.QuestionNos.Where(u => u.StudentId == studentId && u.QuestionId == questionId).ToListAsync();
+
+            if (questionNo == null)
+            {
+                return NotFound();
+            }
+
+            return questionNo;
+        }
         // PUT: api/QuestionNoes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]

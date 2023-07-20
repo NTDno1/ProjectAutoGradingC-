@@ -1,55 +1,153 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using DataAccess.Models
-@model List<Question>
+@model List<QuestionDTO>
 @{
     Layout = null;
 }
 @{
     var questionNo = ViewBag.questioNo as List<QuestionNo>;
 }
-<table>
-    <tr>
-        <th>CodeTest</th>
-        <th>TotaMark</th>
-        <th>Detail</th>
-    </tr>
-    @foreach(Question item in Model)
-    {
-     <tr>
-            <td><span>@item.QuestionId</span></td>
-            <td>@item.TotalMark</td>
-            <td><a asp-action="Index" asp-route-ids="@item.StudentId" asp-route-id="@item.StudentId">Detail</a></td>
-     </tr>
-    }
-   
-</table>
-@if (questionNo!= null)
+<div class="header">
+    <a href="#" class="logo">Logo</a>
+    <div class="navigation">
+        <a href="#">Home</a>
+        <a href="#">Đăng nhập</a>
+        <a href="#">Đăng xuất</a>
+    </div>
+</div>
+<div class="container">
+@if (Model.Count > 0)
 {
     <table>
         <tr>
             <th>CodeTest</th>
-            <th>Question</th>
-            <th>Mark</th>
-            <th>Status</th>
-            <th>Note</th>
-            <th>InputTestCase</th>
-            <th>OutPutTestCase</th>
-            <th>YourOutPut</th>
+            <th>TotaMark</th>
+            <th>Detail</th>
         </tr>
-        @foreach (var item in questionNo)
+        @foreach (QuestionDTO item in Model)
         {
-             <tr>
+            <tr>
                 <td><span>@item.QuestionId</span></td>
-                <td><span>@item.QuestionStt</span></td>
-                <td><span>@item.Mark</span></td>
-                <td><span>@item.Status</span></td>
-                <td><span>@item.Note</span></td>
-                <td><span>@item.InputTestCase</span></td>
-                <td><span>@item.OutputTestCase</span></td>
-                <td><span>@item.Output</span></td>
-
-             </tr>
+                <td>@item.TotalMark</td>
+                <td><a asp-action="Index" asp-route-questionid="@item.QuestionId" asp-route-id="@item.StudentId">Detail</a></td>
+            </tr>
         }
 
     </table>
+    @if (questionNo != null)
+    {
+        <table>
+            <tr>
+                <th>CodeTest</th>
+                <th>Question</th>
+                <th>Mark</th>
+                <th>Status</th>
+                <th>Note</th>
+                <th>InputTestCase</th>
+                <th>OutPutTestCase</th>
+                <th>YourOutPut</th>
+            </tr>
+            @foreach (var item in questionNo)
+            {
+                <tr>
+                    <td><span>@item.QuestionId</span></td>
+                    <td><span>@item.QuestionStt</span></td>
+                    <td><span>@item.Mark</span></td>
+                    <td><span>@item.Status</span></td>
+                    <td><span>@item.Note</span></td>
+                    <td><span>@item.InputTestCase</span></td>
+                    <td><span>@item.OutputTestCase</span></td>
+                    <td><span>@item.Output</span></td>
+                </tr>
+            }
+
+        </table>
+    }
 }
+
+
+@if (Model.Count == 0)
+{
+    <span>Học Sinh Không Có Bài Kiểm Tra</span>
+}
+</div>
+
+<style>
+            /* CSS cho header */
+        .header {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .logo {
+            color: #333;
+            font-size: 24px;
+            text-decoration: none;
+        }
+
+        .navigation a {
+            margin-right: 10px;
+            color: #333;
+            text-decoration: none;
+        }
+    /* Customize table styles */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f0f2f5; /* Light gray background */
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #1877F2; /* Blue header color */
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2; /* Even row color */
+    }
+
+    tr:hover {
+        background-color: #ddd; /* Hover row color */
+        transition: background-color 0.3s ease;
+    }
+
+    /* Customize anchor (link) styles */
+    a {
+        color: #1877F2; /* Blue link color */
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+        a:hover {
+            color: #0F5; /* Darker blue on hover */
+            text-decoration: underline;
+        }
+
+    /* Custom styles for the "No data" message */
+    .no-data-message {
+        font-size: 16px;
+        color: #555;
+    }
+</style>

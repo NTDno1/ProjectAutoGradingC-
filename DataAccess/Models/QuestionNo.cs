@@ -15,7 +15,9 @@ namespace DataAccess.Models
         public string? InputTestCase { get; set; }
         public string? OutputTestCase { get; set; }
         public string? Output { get; set; }
+        public int? ClassId { get; set; }
 
+        public virtual Class? Class { get; set; }
         public virtual QuestionDetail Question { get; set; } = null!;
         public virtual User Student { get; set; } = null!;
     }

@@ -5,7 +5,9 @@
         public int StudentId { get; set; }
         public string QuestionId { get; set; } = null!;
         public double? TotalMark { get; set; }
-        public DateTime? CreateDate { get; set; }
-        public DateTime? UpdateDate { get; set; }
+        public string studentCode { get; set; } = null!;
+        public string studentName { get; set; } = null!;
+        public int? classId { get; set; }
+        public string classs { get; set; } = null!;
     }
 }

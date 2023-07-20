@@ -63,6 +63,11 @@ namespace DataAccess.Models
 
                 entity.Property(e => e.UpdateDate).HasColumnType("date");
 
+                entity.HasOne(d => d.Class)
+                    .WithMany(p => p.Questions)
+                    .HasForeignKey(d => d.ClassId)
+                    .HasConstraintName("FK_Question_Class");
+
                 entity.HasOne(d => d.QuestionNavigation)
                     .WithMany(p => p.Questions)
                     .HasForeignKey(d => d.QuestionId)
@@ -120,6 +125,11 @@ namespace DataAccess.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.StudentId).HasColumnName("StudentID");
+
+                entity.HasOne(d => d.Class)
+                    .WithMany(p => p.QuestionNos)
+                    .HasForeignKey(d => d.ClassId)
+                    .HasConstraintName("FK_QuestionNo_Class");
 
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.QuestionNos)

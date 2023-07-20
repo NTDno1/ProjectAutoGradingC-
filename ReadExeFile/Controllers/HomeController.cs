@@ -88,20 +88,7 @@ namespace ReadExeFile.Controllers
 
                 foreach (var valuee in valueTestCase)
                 {
-                    //if (test.Length > 2)
-                    //{
-                    //    Array.Resize(ref test, test.Length - 2);
-                    //}
                     string contents = System.IO.File.ReadAllText(valuee);
-                    //string input_str = String.Join(" ", new[] { contents.Split('|')[1], contents.Split('|')[2], contents.Split('|')[3] });
-                    //string output_str = contents.Split('|')[^3];
-                    //string mark_str = contents.Split('|')[^1];
-                    //string input1 = contents.Substring(contents.IndexOf("|") + 1, contents.IndexOf("|OUTPUT:") - contents.IndexOf("|") - 1);
-
-
-                    //string output1 = contents.Substring(contents.IndexOf("|OUTPUT:") + 8, contents.IndexOf("|MARK:") - contents.IndexOf("|OUTPUT:") - 8);
-
-                    //string mark1 = contents.Substring(contents.IndexOf("|MARK:") + 6);
                     partss = contents.Split('|');
                     string input1 = partss[1];
                     string output1 = partss[3];
@@ -291,6 +278,7 @@ namespace ReadExeFile.Controllers
                         TotalMark = item.Value,
                         CreateDate = DateTime.Now,
                         UpdateDate = DateTime.Now,
+                        ClassId = usersNotFinish.ClassId
                     };
                     context.Questions.Add(questionDTO);
                     context.SaveChanges();
@@ -310,14 +298,16 @@ namespace ReadExeFile.Controllers
                     QuestionNo question = new QuestionNo()
                     {
                         QuestionId = testCode,
-                        StudentId = user.Id, 
+                        StudentId = user.Id,
                         QuestionStt = item.Question,
                         Mark = item.Mark,
                         Status = "0",
                         Note = "true",
                         InputTestCase = item.InputTestCase,
-                        OutputTestCase= item.OutputTestCase,
-                        Output = item.OutPut
+                        OutputTestCase = item.OutputTestCase,
+                        Output = item.OutPut,
+                        ClassId = user.ClassId
+                        
                     };
                     context.QuestionNos.Add(question);
                     context.SaveChanges();
@@ -335,7 +325,8 @@ namespace ReadExeFile.Controllers
                         Note = "NotFound",
                         InputTestCase = "",
                         OutputTestCase = "",
-                        Output = ""
+                        Output = "",
+                        ClassId = user.ClassId,
                     };
                     Question question = new Question()
                     {
@@ -344,43 +335,13 @@ namespace ReadExeFile.Controllers
                         TotalMark = 0,
                         CreateDate = DateTime.Now,
                         UpdateDate = DateTime.Now,
+                        ClassId = user.ClassId,
                     };
                     context.Questions.Add(question);
                     context.QuestionNos.Add(questionNo);
                     context.SaveChanges();
                 }
             }
-            //string link = "https://localhost:7153/api/Question";
-
-            //using (HttpClient client = new HttpClient())
-            //{
-            //    foreach (var item in studentTotalMarks)
-            //    {
-            //        User users = await GetOneStudentFromApi(item.Key);
-            //        QuestionDTO questionDTO = new QuestionDTO()
-            //        {
-            //            StudentId = users.Id,
-            //            QuestionId = testCode,
-            //            TotalMark = item.Value,
-            //            CreateDate = DateTime.Now,
-            //            UpdateDate = DateTime.Now,
-            //        };
-            //        try
-            //        {
-            //            HttpContent httpContent = new StringContent(JsonConvert.SerializeObject(questionDTO), Encoding.UTF8, "application/json");
-            //            HttpResponseMessage res = await client.PostAsync(link, httpContent);
-            //            {
-
-            //            }
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            Console.WriteLine(ex.Message);
-            //        }
-            //    }
-
-            //}
-
         }
         public async Task AddToDataBasess()
         {

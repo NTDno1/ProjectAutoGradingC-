@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using DataAccess.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using System.Net.WebSockets;
 
 namespace DataAccess.Controllers
 {
@@ -75,6 +76,50 @@ namespace DataAccess.Controllers
             }
 
             return user;
+        }
+        [HttpGet("/GetByClassId")]
+        public dynamic GetUserByClassId(int classId)
+        {
+            if (_context.Users == null)
+            {
+                return NotFound();
+            }
+            var user = _context.Users.Include(u => u.Class).Where(u => u.Class.Id == classId).Select(x =>
+            new
+            {
+                Studentid = x.Id,
+                StudentCode = x.UserName,
+                FullName = x.Name,
+                MSSV = x.Mssv,
+                ClassName = x.Class.Name,
+                classId = x.ClassId
+            }).ToList();
+
+            //List<User> userDTOs = new List<UserDTO>();
+
+            //foreach (var item in user)
+            //{
+            //    UserDTO userDTO = new UserDTO
+            //    {
+            //        StudentCode = item.StudentCode,
+            //        FullName = item.FullName,
+            //        MSSV = item.MSSV,
+            //        ClassName = item.ClassName
+            //    };
+
+            //    userDTOs.Add(userDTO);
+            //}
+
+            //if (userDTOs.Count == 0)
+            //{
+            //    return NotFound();
+            //    if (user == null)
+            //    {
+            //        return NotFound();
+            //    }
+            //}
+                return user;
+            
         }
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
