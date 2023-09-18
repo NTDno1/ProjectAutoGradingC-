@@ -8,5 +8,7 @@
         public string mssv { get; set; }
         public string className { get; set; } = null!;
         public string classId { get; set; } = null!;
+        public string totalmark { get; set; } = null!;
+
     }
 }

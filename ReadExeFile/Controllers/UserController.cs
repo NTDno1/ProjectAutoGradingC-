@@ -16,6 +16,7 @@ namespace ReadExeFile.Controllers
             if (user.Role == 2)
             {
                 //return Redirect($"/Home");
+                TempData["UserId"] = user.Id;
                 return RedirectToAction("ViewTeacher", "ViewUser", new { id = user.Id });
             }
             if (user.Role == 1)

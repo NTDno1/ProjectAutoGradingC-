@@ -31,9 +31,29 @@ namespace ReadExeFile.Controllers
         public IActionResult Index()
         {
             string data = TempData["CheckClass"] as string;
+
+            string checkclass = TempData["CheckTestCase"] as string;
+            string checkFoder = TempData["CheckPathFoder"] as string;
+            string addSuccess = TempData["AddSuccess"] as string;
+
+
             if (data != null)
             {
                 ViewBag.data = data;
+                return View();
+            }
+            if(checkclass != null)
+            {
+                ViewBag.checkclass = checkclass;
+                return View();
+            }
+            if(checkFoder!= null)
+            {
+                ViewBag.checkFoder = checkFoder;
+                return View();
+            }
+            if(addSuccess != null) {
+                ViewBag.addSuccess = addSuccess;
                 return View();
             }
             return View();
@@ -44,6 +64,7 @@ namespace ReadExeFile.Controllers
         static string stringClass = "";
         public async Task<IActionResult> GetUser(string Foder, string TestCase)
         {
+            Foder = "aaa";
             solution1s.Clear();
             studentTotalMarks.Clear();
             testCode = "";
@@ -52,7 +73,16 @@ namespace ReadExeFile.Controllers
             string[] fileNameParts = splitPaths[^1].Split('_');
 
             stringClass = fileNameParts[0];
-            testCode = fileNameParts[1];
+            try
+            {
+                testCode = fileNameParts[1];
+
+            }
+            catch
+            {
+                TempData["CheckPathFoder"] = "Sai Đường Dẫn FoderStudent Hoặc Cấu Trúc Fille";
+                return RedirectToAction("Index", "Home");
+            }
 
             Console.WriteLine("String class: " + stringClass);
             Console.WriteLine("Test code: " + testCode);
@@ -77,37 +107,50 @@ namespace ReadExeFile.Controllers
             string keys = "";
             string result = "";
             string[] partss;
-
-            for (int i = 0; i < filess.Length; i++)
+            try
             {
-                string[] file = Directory.GetFiles(filess[i]);
-                mapTestCaseFile.Add(filess[i], file);
-            }
-            foreach (var testCase in mapTestCaseFile)
-            {
-                valueTestCase = testCase.Value;
-                keys = testCase.Key;
-                string[] parts = keys.Split('\\');
-                string testCaseName = parts[parts.Length - 1];
-                string[] testCaseNameParts = testCaseName.Split('_');
-                result = testCaseNameParts[0]; // kết quả sẽ là "Q1"
-                string[] values = testCase.Value;
-                string checkKey = result.ToLower();
-
-                foreach (var valuee in valueTestCase)
+                for (int i = 0; i < filess.Length; i++)
                 {
-                    string contents = System.IO.File.ReadAllText(valuee);
-                    partss = contents.Split('|');
-                    string input1 = partss[1];
-                    string output1 = partss[3];
-                    string mark1 = partss[5];
-                    Array.Resize(ref test, test.Length + 1);
-                    test[test.Length - 1] = new TestCase(result, mark1, input1, output1);
-                    Console.WriteLine(valuee.ToString());
+                    string[] file = Directory.GetFiles(filess[i]);
+                    mapTestCaseFile.Add(filess[i], file);
                 }
-                mapTestCaseSolution.Add(result, test);
-                Array.Resize(ref test, 0);
+                foreach (var testCase in mapTestCaseFile)
+                {
+                    valueTestCase = testCase.Value;
+                    keys = testCase.Key;
+                    string[] parts = keys.Split('\\');
+                    string testCaseName = parts[parts.Length - 1];
+                    string[] testCaseNameParts = testCaseName.Split('_');
+                    result = testCaseNameParts[0]; // kết quả sẽ là "Q1"
+                    string[] values = testCase.Value;
+                    string checkKey = result.ToLower();
+
+                    foreach (var valuee in valueTestCase)
+                    {
+                        string contents = System.IO.File.ReadAllText(valuee);
+                        partss = contents.Split('|');
+                        string input1 = partss[1];
+                        string output1 = partss[3];
+                        string mark1 = partss[5];
+                        Array.Resize(ref test, test.Length + 1);
+                        test[test.Length - 1] = new TestCase(result, mark1, input1, output1);
+                        Console.WriteLine(valuee.ToString());
+                    }
+                    //if (test == null)
+                    //{
+                    //    TempData["CheckTestCase"] = "Sai Đường Dẫn Test Case Hoặc Cấu Trúc Fille";
+                    //    return RedirectToAction("Index", "Home");
+                    //}
+                    mapTestCaseSolution.Add(result, test);
+                    Array.Resize(ref test, 0);
+                }
             }
+            catch(Exception ex)
+            {
+                TempData["CheckTestCase"] = "Sai Đường Dẫn Test Case Hoặc Cấu Trúc Fille(ex: ..../TestCase)";
+                return RedirectToAction("Index", "Home");
+            }
+
 
             // đường dẫn file exe bài tập. Key He123 value C:\Users\NTD\Desktop\SE1437\HE140001_ANVHE_1
             // key là tên trong solution và value là Solution
@@ -115,99 +158,106 @@ namespace ReadExeFile.Controllers
             Dictionary<string, Solution[]> mapSolutions = new Dictionary<string, Solution[]>();
             List<Solution> solutions = new List<Solution>();
             double mark = 0;
-            for (int i = 0; i < listFilePathFoder.Length; i++)  // chạy 2 forder
+            try
             {
-                string[] pathExe = Directory.GetFiles(listFilePathFoder[i]);
-                string[] splitPath = listFilePathFoder[i].Split('\\');
-                string nameMssvStudent = splitPath[splitPath.Length - 1];
-                mapLinkFileC.Add(splitPath[splitPath.Length - 1], pathExe);
-            }
-            foreach (var entry in mapLinkFileC) // lặp qua key, add value vào array
-            {
-                string studentName = entry.Key;
-
-                string[] parts = studentName.Split('_'); // Tách chuỗi thành các phần tử bằng dấu "_"
-                string studentCode = parts[0].Substring(2); // Lấy phần con số từ vị trí thứ 3 đến hết chuỗi
-
-                string[] values = entry.Value;
-
-                //solutions.Add(key, null);
-                foreach (string value in values) //chạy array lấy ra output và name cho vào list solution
+                for (int i = 0; i < listFilePathFoder.Length; i++)  // chạy 2 forder
                 {
-                    // Tìm vị trí cuối cùng của dấu gạch chéo ngược (\) trong chuỗi đường dẫn
-                    int lastIndex = value.LastIndexOf('\\');
+                    string[] pathExe = Directory.GetFiles(listFilePathFoder[i]);
+                    string[] splitPath = listFilePathFoder[i].Split('\\');
+                    string nameMssvStudent = splitPath[splitPath.Length - 1];
+                    mapLinkFileC.Add(splitPath[splitPath.Length - 1], pathExe);
+                }
+                foreach (var entry in mapLinkFileC) // lặp qua key, add value vào array
+                {
+                    string studentName = entry.Key;
 
-                    // Lấy phần tên tập tin sau dấu gạch chéo ngược
-                    answer = value.Substring(lastIndex + 1);
+                    string[] parts = studentName.Split('_'); // Tách chuỗi thành các phần tử bằng dấu "_"
+                    string studentCode = parts[0].Substring(2); // Lấy phần con số từ vị trí thứ 3 đến hết chuỗi
 
-                    // Xóa phần mở rộng file (.exe) nếu có
-                    int extensionIndex = answer.LastIndexOf('.');
-                    if (extensionIndex >= 0)
+                    string[] values = entry.Value;
+
+                    //solutions.Add(key, null);
+                    foreach (string value in values) //chạy array lấy ra output và name cho vào list solution
                     {
-                        answer = answer.Substring(0, extensionIndex);
-                    }
+                        // Tìm vị trí cuối cùng của dấu gạch chéo ngược (\) trong chuỗi đường dẫn
+                        int lastIndex = value.LastIndexOf('\\');
 
-                    // In ra tên tập tin Q1
-                    Console.WriteLine(answer);
-                    // Tạo một đối tượng ProcessStartInfo để cấu hình thực thi file .exe
-                    ProcessStartInfo startInfo = new ProcessStartInfo
-                    {
-                        FileName = value,
-                        Arguments = arguments,
-                        RedirectStandardInput = true, // Chuyển hướng đầu vào của tiến trình
-                        RedirectStandardOutput = true, // Chuyển hướng đầu ra của tiến trình
-                        UseShellExecute = false, // Không sử dụng Shell để thực thi
-                        CreateNoWindow = true // Không tạo ra cửa sổ mới cho tiến trình
-                    };
+                        // Lấy phần tên tập tin sau dấu gạch chéo ngược
+                        answer = value.Substring(lastIndex + 1);
 
-                    // Tạo đối tượng Process để chạy file .exe
-                    using (Process process = new Process())
-                    {
-                        process.StartInfo = startInfo;
-                        process.Start();
-
-                        // Gửi dữ liệu vào tiến trình nếu có
-                        if (mapTestCaseSolution != null)
+                        // Xóa phần mở rộng file (.exe) nếu có
+                        int extensionIndex = answer.LastIndexOf('.');
+                        if (extensionIndex >= 0)
                         {
-                            // truyền input
-                            foreach (var map in mapTestCaseSolution)
-                            {
-                                string questionNo = map.Key;
-                                if (answer.Contains(map.Key))
-                                {
-                                    TestCase[] valuess = map.Value;
-                                    foreach (var item in valuess)
-                                    {
-                                        process.StandardInput.WriteLine(item.InPut);
-                                        process.StandardInput.Close();
-                                        output = process.StandardOutput.ReadToEnd();
-                                        //Console.WriteLine(output);
-                                        // Chờ tiến trình kết thúc
-                                        process.WaitForExit(); string cleanedInput = output.Replace("\r\n", "");
-                                        int startIndex = cleanedInput.IndexOf("OUTPUT:") + 7;
-                                        string outputValue = cleanedInput.Substring(startIndex);
-                                        // Sử dụng giá trị đầu ra theo ý muốn trong ứng dụng web của bạn
-                                        //solution1s.Add(new Solution(studentName, questionNo, outputValue));
+                            answer = answer.Substring(0, extensionIndex);
+                        }
 
-                                        //var marks = item.STT;
-                                        if (outputValue.Trim().Contains(item.Output.Trim()))
+                        // In ra tên tập tin Q1
+                        Console.WriteLine(answer);
+                        // Tạo một đối tượng ProcessStartInfo để cấu hình thực thi file .exe
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = value,
+                            Arguments = arguments,
+                            RedirectStandardInput = true, // Chuyển hướng đầu vào của tiến trình
+                            RedirectStandardOutput = true, // Chuyển hướng đầu ra của tiến trình
+                            UseShellExecute = false, // Không sử dụng Shell để thực thi
+                            CreateNoWindow = true // Không tạo ra cửa sổ mới cho tiến trình
+                        };
+
+                        // Tạo đối tượng Process để chạy file .exe
+                        using (Process process = new Process())
+                        {
+                            process.StartInfo = startInfo;
+                            process.Start();
+
+                            // Gửi dữ liệu vào tiến trình nếu có
+                            if (mapTestCaseSolution != null)
+                            {
+                                // truyền input
+                                foreach (var map in mapTestCaseSolution)
+                                {
+                                    string questionNo = map.Key;
+                                    if (answer.Equals(map.Key))
+                                    {
+                                        TestCase[] valuess = map.Value;
+                                        foreach (var item in valuess)
                                         {
-                                            //mark += double.Parse(item.Mark);
-                                            solution1s.Add(new Solution(studentName, studentCode, questionNo + " " + testCode, item.InPut, item.Output, item.Mark, outputValue, Convert.ToDouble(item.Mark)));
+                                            process.StandardInput.WriteLine(item.InPut);
+                                            process.StandardInput.Close();
+                                            output = process.StandardOutput.ReadToEnd();
+                                            //Console.WriteLine(output);
+                                            // Chờ tiến trình kết thúc
+                                            process.WaitForExit(); string cleanedInput = output.Replace("\r\n", "");
+                                            int startIndex = cleanedInput.IndexOf("OUTPUT:") + 7;
+                                            string outputValue = cleanedInput.Substring(startIndex);
+                                            // Sử dụng giá trị đầu ra theo ý muốn trong ứng dụng web của bạn
+                                            //solution1s.Add(new Solution(studentName, questionNo, outputValue));
+
+                                            //var marks = item.STT;
+                                            if (outputValue.Trim().Contains(item.Output.Trim()))
+                                            {
+                                                //mark += double.Parse(item.Mark);
+                                                solution1s.Add(new Solution(studentName, studentCode, questionNo + " " + testCode, item.InPut, item.Output, item.Mark, outputValue, Convert.ToDouble(item.Mark)));
+                                            }
+                                            else
+                                            {
+                                                solution1s.Add(new Solution(studentName, studentCode, questionNo + " " + testCode, item.InPut, item.Output, "0", outputValue, double.Parse("0")));
+                                            }
+                                            process.Start();
                                         }
-                                        else
-                                        {
-                                            solution1s.Add(new Solution(studentName, studentCode, questionNo + " " + testCode, item.InPut, item.Output, "0", outputValue, double.Parse("0")));
-                                        }
-                                        process.Start();
                                     }
                                 }
-
+                                process.StandardInput.Close();
                             }
-                            process.StandardInput.Close();
                         }
                     }
                 }
+            }
+            catch(Exception ex)
+            {
+                TempData["CheckTestCase"] = "Sai Đường Dẫn Test Case Hoặc Cấu Trúc Fille (ex:..../SE1606_123456)";
+                return RedirectToAction("Index", "Home");
             }
 
             foreach (var so in solution1s)
@@ -231,10 +281,10 @@ namespace ReadExeFile.Controllers
                     users.Remove(studentToRemove);
                 }
             }
-            foreach (var kvp in studentTotalMarks)
-            {
-                Console.WriteLine("Học sinh {0}: Tổng điểm = {1}", kvp.Key, kvp.Value);
-            }
+            //foreach (var kvp in studentTotalMarks)
+            //{
+            //    Console.WriteLine("Học sinh {0}: Tổng điểm = {1}", kvp.Key, kvp.Value);
+            //}
 
             //foreach (var solution in solutions) // add output vào trong mapSolution 
             //{
@@ -355,10 +405,20 @@ namespace ReadExeFile.Controllers
                     context.SaveChanges();
                 }
             }
-            return Ok();
+            TempData["AddSuccess"] = "Thêm Điểm Thành Công Vào database";
+            return RedirectToAction("Index", "Home");
         }
-        public async Task AddToDataBasess()
+        public IActionResult TakeMark()
         {
+            return RedirectToAction("Index", "Home");
+        }
+        public IActionResult GetMark()
+        {
+            return RedirectToAction("ViewTeacher", "ViewUser");
+        }
+        public IActionResult logOut()
+        {
+            return RedirectToAction("Index", "User");
         }
         public IActionResult Privacy()
         {

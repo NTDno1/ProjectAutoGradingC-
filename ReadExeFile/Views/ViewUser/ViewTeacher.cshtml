@@ -11,15 +11,14 @@
     var user = ViewBag.users as List<UserDTO>;
     var questionList = ViewBag.questionList as List<QuestionDTO>;
 }
-<div class="header">
-    <a href="#" class="logo">Logo</a>
-    <div class="navigation">
-        <a href=""</a>
-        <a href="#">Xem Điểm</a>
-        <a href="#">Đăng nhập</a>
-        <a href="#">Đăng xuất</a>
+    <div class="header">
+        <a href="#" class="logo">Logo</a>
+        <div class="navigation">
+            <a asp-action="TakeMark">Chấm Điểm</a>
+            <a asp-action="GetMark" >Xem Điểm</a>
+            <a asp-action="logOut">Đăng xuất</a>
+        </div>
     </div>
-</div>
 <div class="container">
 @if(classs!= null){
     <table>
@@ -46,6 +45,7 @@
                 <th>Full Name</th>
                 <th>MSSV</th>
                 <th>ClassName</th>
+                <th>QuestionCode</th>
                 <th>Detail</th>
             </tr>
             @foreach (var item in user)
@@ -57,11 +57,39 @@
                     <td><span>@item.className</span></td>
                     <td><a asp-action="ViewTeacher" asp-route-classId="@item.classId" asp-route-studentId="@item.Studentid">Detail</a></td>
                 </tr>
+    @if (questionList != null)
+    {
+        @* <table>
+            <tr>
+                <th>StudentId</th>
+                <th>QuestionId</th>
+                <th>TotalMark</th>
+                <th>StudentCode</th>
+                <th>FullName</th>
+                <th>ClassName</th>
+                <th>Detail</th>
+            </tr> *@
+            @foreach(var items in questionList)
+            {
+                @if(items.studentCode == item.studentCode){
+                <tr>
+                <td><span>@items.StudentId</span></td>
+                <td><span>@items.QuestionId</span></td>
+                <td><span>@items.TotalMark</span></td>
+                <td><span>@items.studentCode</span></td>
+                <td><span>@items.studentName</span></td>
+                <td><span>@items.classs</span></td>
+                <td><a asp-action="ViewTeacher" asp-route-classId="@items.classId" asp-route-studentId="@items.StudentId" asp-route-markDetail="@items.QuestionId">Detail</a></td>
+                </tr>
+                }
+            }
+        @* </table> *@
+    }
             }
 
         </table>
     }
-    @if (questionList != null)
+    @* @if (questionList != null)
     {
         <table>
             <tr>
@@ -86,7 +114,7 @@
                 </tr>
             }
         </table>
-    }
+    } *@
     @if (listMarkDetail!= null)
     {
         <table>
@@ -97,7 +125,6 @@
                 <th>InputTestCase</th>
                 <th>OutputTestCase</th>
                 <th>YourOutput</th>
-                <th>Detail</th>
 
             </tr>
             @foreach (var item in listMarkDetail)
@@ -109,7 +136,6 @@
                     <td><span>@item.InputTestCase</span></td>
                     <td><span>@item.OutputTestCase</span></td>
                     <td><span>@item.Output</span></td>
-                    <td><a asp-action="ViewTeacher" asp-route-classId="@item.ClassId" asp-route-studentId="@item.StudentId" asp-route-listMarkDetail="@item.QuestionId">Detail</a></td>
                 </tr>
             }
         </table>

@@ -25,21 +25,26 @@ namespace ReadExeFile.Controllers
         public async Task<IActionResult> ViewTeacher(int classId, int studentId, string markDetail)
         {
             List<Class> classs = await GetListClass();
-            //List<Question> questions = await GetMarkByStudentIdi();
+            //List<QuestionDTO> questions = await GetMarkByStudentIdi();
             if (classId != 0)
             {
+                List<QuestionDTO> questionListss = await GetMarkByStudentIdi();
                 List<UserDTO> users = await ListUserByClassId(classId);
+                ViewBag.questionList = questionListss;
                 ViewBag.users = users;
                 ViewBag.classs = classs;
                 if (studentId != 0)
                 {
                     List<QuestionDTO> questionList = await GetMarkByStudentIdi(studentId);
+                    List<QuestionDTO> questionLists = await GetMarkByStudentIdi();
                     ViewBag.users = users;
                     ViewBag.classs = classs;
                     ViewBag.questionList = questionList;
+                    ViewBag.questionLists = questionLists;
+
                     if (markDetail != null)
                     {
-                        List<QuestionNo> listMarkDetail = await GetMarkDetail(studentId,markDetail);
+                        List<QuestionNo> listMarkDetail = await GetMarkDetail(studentId, markDetail);
                         ViewBag.users = users;
                         ViewBag.classs = classs;
                         ViewBag.questionList = questionList;
@@ -62,11 +67,40 @@ namespace ReadExeFile.Controllers
             //ViewBag.questioNo = questioNo;
             return RedirectToAction("Index"); // Chuyển hướng đến action Index
         }
+        public IActionResult TakeMark()
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        public IActionResult GetMark()
+        {
+            return RedirectToAction("ViewTeacher", "ViewUser");
+        }
+
         public async Task<List<QuestionDTO>> GetMarkByStudentIdi(int id)
         {
             List<QuestionDTO> question = new List<QuestionDTO>();
 
             string link = "https://localhost:7153/id?id=" + id + "";
+
+            using (HttpClient client = new HttpClient())
+            {
+                using (HttpResponseMessage res = await client.GetAsync(link))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                        question = JsonConvert.DeserializeObject<List<QuestionDTO>>(data);
+                    }
+                }
+            }
+            return question;
+        }
+
+        public async Task<List<QuestionDTO>> GetMarkByStudentIdi()
+        {
+            List<QuestionDTO> question = new List<QuestionDTO>();
+
+            string link = "https://localhost:7153/api/Question";
 
             using (HttpClient client = new HttpClient())
             {
@@ -106,6 +140,26 @@ namespace ReadExeFile.Controllers
             List<QuestionNo> question = new List<QuestionNo>();
 
             string link = "https://localhost:7153/api/QuestionNoes/"+id+"/"+ questionId + "";
+
+            using (HttpClient client = new HttpClient())
+            {
+                using (HttpResponseMessage res = await client.GetAsync(link))
+                {
+                    using (HttpContent content = res.Content)
+                    {
+                        string data = await content.ReadAsStringAsync();
+                        question = JsonConvert.DeserializeObject<List<QuestionNo>>(data);
+                    }
+                }
+            }
+            return question;
+        }
+
+        public async Task<List<QuestionNo>> GetMarkDetail(int id)
+        {
+            List<QuestionNo> question = new List<QuestionNo>();
+
+            string link = "https://localhost:7153/api/QuestionNoes/" + id +"";
 
             using (HttpClient client = new HttpClient())
             {

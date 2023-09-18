@@ -84,7 +84,7 @@ namespace DataAccess.Controllers
             {
                 return NotFound();
             }
-            var user = _context.Users.Include(u => u.Class).Where(u => u.Class.Id == classId).Select(x =>
+            var user = _context.Users.Include(u => u.Class).Include(u=>u.Questions).Where(u => u.Class.Id == classId).Select(x =>
             new
             {
                 Studentid = x.Id,

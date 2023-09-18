@@ -82,8 +82,8 @@
     <div class="container">
         <form asp-action="login" method="post" class="login-form">
             <h1>Đăng nhập</h1>
-            <input type="text" placeholder="Email" name="userName">
-            <input type="password" placeholder="Mật khẩu" name="passWord">
+            <input required type="text" placeholder="Email" name="userName">
+            <input required type="password" placeholder="Mật khẩu" name="passWord">
             @if (ViewData["Error"] != null)
             {
                 <div class="alert alert-danger" role="alert">
